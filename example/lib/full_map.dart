@@ -31,6 +31,12 @@ class FullMapState extends State<FullMap> {
       MapEvents.MAP_LOADED,
       MapEvents.MAP_IDLE,
     ]);
+
+    mapboxMap.setStyleImportConfigProperty("lightPreset", "night");
+    mapboxMap.setStyleImportConfigProperty("showPointOfInterestLabels", false);
+    mapboxMap.setStyleImportConfigProperty("showTransitLabels", false);
+    mapboxMap.setStyleImportConfigProperty("showPlaceLabels", false);
+    mapboxMap.setStyleImportConfigProperty("showRoadLabels", false);
   }
 
   _eventObserver(Event event) {
@@ -38,11 +44,7 @@ class FullMapState extends State<FullMap> {
   }
 
   _onStyleLoadedCallback(StyleLoadedEventData data) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text("Style loaded :), begin: ${data.begin}"),
-      backgroundColor: Theme.of(context).primaryColor,
-      duration: Duration(seconds: 1),
-    ));
+    print("Style loaded :), begin: ${data.begin}");
   }
 
   _onCameraChangeListener(CameraChangedEventData data) {
@@ -62,8 +64,8 @@ class FullMapState extends State<FullMap> {
   }
 
   _onRenderFrameStartedListener(RenderFrameStartedEventData data) {
-    print(
-        "RenderFrameStartedEventData: begin: ${data.begin}, end: ${data.end}");
+    // print(
+    //     "RenderFrameStartedEventData: begin: ${data.begin}, end: ${data.end}");
   }
 
   _onRenderFrameFinishedListener(RenderFrameFinishedEventData data) {
@@ -98,13 +100,15 @@ class FullMapState extends State<FullMap> {
   static final locationLondonEye =
       Position(-0.11952504657173119, 51.50316108984406);
   static final melbourne = Position(144.97014966047533, -37.81057992982308);
+  static final appleSingapore =
+      Position(103.85753962019713, 1.2833916359683666);
 
-  static final defaultPoint = locationLondonEye;
+  static final defaultPoint = appleSingapore;
 
   bool started = false;
   final end = CameraOptions(
     center: Point(coordinates: defaultPoint).toJson(),
-    zoom: (15.5),
+    zoom: (16.5),
     pitch: (75.0),
     bearing: (130.0),
   );
@@ -132,8 +136,20 @@ class FullMapState extends State<FullMap> {
                     );
                     print("_onPointAnnotationClick, started: $started");
                     mapboxMap?.flyTo(started ? start : end,
-                        MapAnimationOptions(duration: 5000, startDelay: 0));
+                        MapAnimationOptions(duration: 2000, startDelay: 0));
                     started = !started;
+
+                    // mapboxMap?.easeTo(cameraOptions, mapAnimationOptions);
+
+                    // if (started) {
+                    //   mapboxMap?.setStyleImportConfigProperty(
+                    //       "lightPreset", "night");
+                    // } else {
+                    //   mapboxMap?.setStyleImportConfigProperty(
+                    //       "lightPreset", "dusk");
+                    // }
+
+                    // print("_onPointAnnotationClick, started: $started");
 
                     // if (isLight) {
                     //   mapboxMap?.loadStyleURI(MapboxStyles.LIGHT);
@@ -149,8 +165,8 @@ class FullMapState extends State<FullMap> {
           key: ValueKey("mapWidget"),
           resourceOptions: ResourceOptions(accessToken: MapsDemo.ACCESS_TOKEN),
           cameraOptions: CameraOptions(
-              center: Point(coordinates: defaultPoint).toJson(), zoom: 3.0),
-          styleUri: 'mapbox://styles/mapbox/standard-beta',
+              center: Point(coordinates: defaultPoint).toJson(), zoom: 0.75),
+          styleUri: 'mapbox://styles/mapbox/standard',
           textureView: true,
           onMapCreated: _onMapCreated,
           onStyleLoadedListener: _onStyleLoadedCallback,

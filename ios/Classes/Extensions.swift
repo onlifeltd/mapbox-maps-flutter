@@ -5,22 +5,9 @@ import CoreGraphics
 import CoreLocation
 
 let COORDINATES = "coordinates"
-// FLT to Mapbox
-//extension FLTMapMemoryBudgetInMegabytes {
-//    func toMapMemoryBudgetInMegabytes() -> MapMemoryBudgetInMegabytes {
-//        return MapMemoryBudgetInMegabytes.init(size: size.uint64Value)
-//    }
-//}
-//
-//extension FLTMapMemoryBudgetInTiles {
-//    func toTMapMemoryBudgetInTiles() -> MapMemoryBudgetInTiles {
-//        return MapMemoryBudgetInTiles.init(size: size.uint64Value)
-//    }
-//}
 
 extension FLTSourceQueryOptions {
     func toSourceQueryOptions() throws -> SourceQueryOptions {
-        //        let filterExp =  try JSONDecoder().decode(Expression.self, from: filter.data(using: .utf8)!)
         return SourceQueryOptions(sourceLayerIds: sourceLayerIds, filter: filter)
     }
 }
@@ -61,24 +48,12 @@ extension FLTCameraBoundsOptions {
     }
 }
 extension FLTScreenBox {
-    func toScreenBox() -> ScreenBox {
-        return ScreenBox(min: self.min.toScreenCoordinate(), max: self.max.toScreenCoordinate())
+    func toCGRect() -> CGRect {
+        return CGRect(x: min.x.doubleValue, y: min.y.doubleValue, width: max.x.doubleValue - min.x.doubleValue, height: max.y.doubleValue - min.y.doubleValue)
     }
+}
 
-    func toCGRect() -> CGRect {
-        return toScreenBox().toCGRect()
-    }
-}
-extension ScreenBox {
-    func toCGRect() -> CGRect {
-        return CGRect(x: min.x, y: min.y, width: max.x - min.x, height: max.y - min.y)
-    }
-}
 extension FLTScreenCoordinate {
-    func toScreenCoordinate() -> ScreenCoordinate {
-        return ScreenCoordinate(x: self.x.doubleValue, y: self.y.doubleValue)
-    }
-
     func toCGPoint() -> CGPoint {
         return CGPoint(x: self.x.doubleValue, y: self.y.doubleValue)
     }
@@ -165,7 +140,7 @@ extension QueriedFeature {
 
 extension QueriedRenderedFeature {
     func toFLTQueriedFeature() -> FLTQueriedFeature {
-        let stateString = convertDictionaryToString(dict: queriedFeature.state as? [String: Any])
+        _ = convertDictionaryToString(dict: queriedFeature.state as? [String: Any])
         return FLTQueriedFeature.make(withFeature: queriedFeature.feature.toMap(), source: queriedFeature.source, sourceLayer: queriedFeature.sourceLayer, state: "")
     }
 }
@@ -215,7 +190,7 @@ extension MapOptions {
             viewportMode: .init(value: .DEFAULT),
             orientation: .init(value: .UPWARDS),
             crossSourceCollisions: NSNumber(value: self.crossSourceCollisions),
-            optimizeForTerrain: NSNumber(value: self.optimizeForTerrain),
+            optimizeForTerrain: NSNumber(value: 0),
             size: self.size?.toFLTSize(),
             pixelRatio: NSNumber(value: self.pixelRatio),
             glyphsRasterizationOptions: self.glyphsRasterizationOptions?.toFLTGlyphsRasterizationOptions()
@@ -404,12 +379,13 @@ func toRgb(alpha: Int, red: Int, green: Int, blue: Int) -> Int {
 
 extension StyleColor {
     func rgb() -> Int {
-        return toRgb(
-            alpha: Int(self.alpha * 255),
-            red: Int(self.red),
-            green: Int(self.green),
-            blue: Int(self.blue)
-        )
+        return toRgb(alpha: 0, red: 0, green: 0, blue: 0)
+//        return toRgb(
+//            alpha: Int(self.alpha * 255),
+//            red: Int(self.red),
+//            green: Int(self.green),
+//            blue: Int(self.blue)
+//        )
     }
 }
 

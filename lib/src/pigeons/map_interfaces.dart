@@ -585,6 +585,7 @@ class MapAnimationOptions {
   MapAnimationOptions({
     this.duration,
     this.startDelay,
+    this.curve,
   });
 
   /// The duration of the animation in milliseconds.
@@ -595,10 +596,15 @@ class MapAnimationOptions {
   /// If not set explicitly default startDelay will be taken 0ms. This only works for Android.
   int? startDelay;
 
+  /// The curve of the animation. If not set explicitly default curve will be taken `easeOut`.
+  /// values: 0 - easeInOut, 1 - easeIn, 2 - easeOut, 3 - linear
+  int? curve;
+
   Object encode() {
     return <Object?>[
       duration,
       startDelay,
+      curve,
     ];
   }
 
@@ -607,6 +613,7 @@ class MapAnimationOptions {
     return MapAnimationOptions(
       duration: result[0] as int?,
       startDelay: result[1] as int?,
+      curve: result[2] as int?,
     );
   }
 }

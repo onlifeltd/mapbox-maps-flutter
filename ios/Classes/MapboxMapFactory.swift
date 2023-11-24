@@ -88,7 +88,6 @@ class MapboxMapFactory: NSObject, FlutterPlatformViewFactory {
                 viewportMode: viewportMode,
                 orientation: orientation,
                 crossSourceCollisions: crossSourceCollisions,
-                optimizeForTerrain: optimizeForTerrain,
                 size: size,
                 pixelRatio: pixelRatio,
                 glyphsRasterizationOptions: createGlyphsRasterizationOptions(args: mapOptionsMap)

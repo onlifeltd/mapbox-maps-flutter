@@ -139,9 +139,10 @@ class MapInterfaceController: NSObject, FLT_MapInterface {
                 guard let minCoord = screenBoxArray[0] as? [Double] else {return}
                 guard let maxCoord = screenBoxArray[1] as? [Double] else {return}
 
-                let screenBox = ScreenBox(min: ScreenCoordinate(x: minCoord[0], y: minCoord[1]),
-                                          max: ScreenCoordinate(x: maxCoord[0], y: maxCoord[1]))
-                let cgRect = screenBox.toCGRect()
+//                let screenBox = ScreenBox(min: ScreenCoordinate(x: minCoord[0], y: minCoord[1]),
+//                                          max: ScreenCoordinate(x: maxCoord[0], y: maxCoord[1]))
+//                let cgRect = screenBox.toCGRect()
+                let cgRect = CGRect(x: minCoord[0], y: minCoord[0], width: maxCoord[0] - minCoord[0], height: maxCoord[1]-minCoord[1])
                 let queryOptions = try options.toRenderedQueryOptions()
                 self.mapboxMap.queryRenderedFeatures(with: cgRect, options: queryOptions) { result in
                     switch result {
