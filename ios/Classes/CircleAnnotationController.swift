@@ -103,7 +103,7 @@ class CircleAnnotationController: NSObject, FLT_CircleAnnotationMessager {
 func setCirclePitchAlignmentManagerId(_ managerId: String, circlePitchAlignment: FLTCirclePitchAlignment, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? CircleAnnotationManager {
-                manager.circlePitchAlignment = CirclePitchAlignment.allCases[Int(circlePitchAlignment.rawValue)]
+                manager.circlePitchAlignment = circlePitchAlignment == FLTCirclePitchAlignment.VIEWPORT ? CirclePitchAlignment.viewport : CirclePitchAlignment.map
 
                 completion(nil)
             } else {
@@ -118,7 +118,7 @@ func getCirclePitchAlignmentManagerId(_ managerId: String, completion: @escaping
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? CircleAnnotationManager {
                if let circlePitchAlignment = manager.circlePitchAlignment {
-                let index = CirclePitchAlignment.allCases.firstIndex(of: circlePitchAlignment)!
+                   let index = CirclePitchAlignment.viewport == circlePitchAlignment ? 1 : 0
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -134,8 +134,8 @@ func getCirclePitchAlignmentManagerId(_ managerId: String, completion: @escaping
 func setCirclePitchScaleManagerId(_ managerId: String, circlePitchScale: FLTCirclePitchScale, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? CircleAnnotationManager {
-                manager.circlePitchScale = CirclePitchScale.allCases[Int(circlePitchScale.rawValue)]
-
+                manager.circlePitchScale = circlePitchScale.rawValue == 1 ? CirclePitchScale.viewport : CirclePitchScale.map
+                
                 completion(nil)
             } else {
                 completion(FlutterError(code: CircleAnnotationController.errorCode, message: "No manager found with id: \(managerId)", details: nil))
@@ -149,7 +149,7 @@ func getCirclePitchScaleManagerId(_ managerId: String, completion: @escaping ( N
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? CircleAnnotationManager {
                if let circlePitchScale = manager.circlePitchScale {
-                let index = CirclePitchScale.allCases.firstIndex(of: circlePitchScale)!
+                   let index = CirclePitchScale.viewport == circlePitchScale ? 1 : 0
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -194,7 +194,7 @@ func getCircleTranslateManagerId(_ managerId: String, completion: @escaping ( [N
 func setCircleTranslateAnchorManagerId(_ managerId: String, circleTranslateAnchor: FLTCircleTranslateAnchor, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? CircleAnnotationManager {
-                manager.circleTranslateAnchor = CircleTranslateAnchor.allCases[Int(circleTranslateAnchor.rawValue)]
+                manager.circleTranslateAnchor = circleTranslateAnchor.rawValue == 1 ?  CircleTranslateAnchor.viewport : CircleTranslateAnchor.map
 
                 completion(nil)
             } else {
@@ -209,7 +209,7 @@ func getCircleTranslateAnchorManagerId(_ managerId: String, completion: @escapin
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? CircleAnnotationManager {
                if let circleTranslateAnchor = manager.circleTranslateAnchor {
-                let index = CircleTranslateAnchor.allCases.firstIndex(of: circleTranslateAnchor)!
+                   let index = CircleTranslateAnchor.viewport == circleTranslateAnchor ? 1 : 0
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)

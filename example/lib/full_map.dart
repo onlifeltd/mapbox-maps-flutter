@@ -95,6 +95,26 @@ class FullMapState extends State<FullMap> {
     print("StyleImageUnusedEventData: begin: ${data.begin}, end: ${data.end}");
   }
 
+  static final locationLondonEye =
+      Position(-0.11952504657173119, 51.50316108984406);
+  static final melbourne = Position(144.97014966047533, -37.81057992982308);
+
+  static final defaultPoint = locationLondonEye;
+
+  bool started = false;
+  final end = CameraOptions(
+    center: Point(coordinates: defaultPoint).toJson(),
+    zoom: (15.5),
+    pitch: (75.0),
+    bearing: (130.0),
+  );
+  final start = CameraOptions(
+    center: Point(coordinates: defaultPoint).toJson(),
+    zoom: (2.0),
+    pitch: (0.0),
+    bearing: (0.0),
+  );
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -110,11 +130,16 @@ class FullMapState extends State<FullMap> {
                     setState(
                       () => isLight = !isLight,
                     );
-                    if (isLight) {
-                      mapboxMap?.loadStyleURI(MapboxStyles.LIGHT);
-                    } else {
-                      mapboxMap?.loadStyleURI(MapboxStyles.DARK);
-                    }
+                    print("_onPointAnnotationClick, started: $started");
+                    mapboxMap?.flyTo(started ? start : end,
+                        MapAnimationOptions(duration: 5000, startDelay: 0));
+                    started = !started;
+
+                    // if (isLight) {
+                    //   mapboxMap?.loadStyleURI(MapboxStyles.LIGHT);
+                    // } else {
+                    //   mapboxMap?.loadStyleURI(MapboxStyles.DARK);
+                    // }
                   }),
               SizedBox(height: 10),
             ],
@@ -124,13 +149,8 @@ class FullMapState extends State<FullMap> {
           key: ValueKey("mapWidget"),
           resourceOptions: ResourceOptions(accessToken: MapsDemo.ACCESS_TOKEN),
           cameraOptions: CameraOptions(
-              center: Point(
-                  coordinates: Position(
-                6.0033416748046875,
-                43.70908256335716,
-              )).toJson(),
-              zoom: 3.0),
-          styleUri: MapboxStyles.LIGHT,
+              center: Point(coordinates: defaultPoint).toJson(), zoom: 3.0),
+          styleUri: 'mapbox://styles/mapbox/standard-beta',
           textureView: true,
           onMapCreated: _onMapCreated,
           onStyleLoadedListener: _onStyleLoadedCallback,

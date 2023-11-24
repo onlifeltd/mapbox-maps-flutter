@@ -25,9 +25,9 @@ extension LocationOptions {
         }
         switch settings.puckBearingSource?.value {
         case .COURSE:
-            options.puckBearingSource = .course
+            options.puckBearing = .course
         default:
-            options.puckBearingSource = .heading
+            options.puckBearing = .heading
         }
         if settings.enabled == false {
             options.puckType = nil
@@ -109,7 +109,7 @@ extension LocationOptions {
             enabled = NSNumber(true)
         }
         let puckBearingEnabled = NSNumber(value: self.puckBearingEnabled)
-        let puckBearingSource: FLT_SETTINGSPuckBearingSource = self.puckBearingSource == .heading ?
+        let puckBearingSource: FLT_SETTINGSPuckBearingSource = self.puckBearing == .heading ?
             .HEADING : .COURSE
         var accuracyRingColor: NSNumber?
         var accuracyRingBorderColor: NSNumber?

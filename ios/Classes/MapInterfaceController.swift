@@ -3,6 +3,10 @@ import Foundation
 import UIKit
 
 class MapInterfaceController: NSObject, FLT_MapInterface {
+    func getResourceOptionsWithError(_ error: AutoreleasingUnsafeMutablePointer<FlutterError?>) -> FLTResourceOptions? {
+        return nil
+    }
+
     private static let errorCode = "0"
     private var mapboxMap: MapboxMap
     init(withMapboxMap mapboxMap: MapboxMap) {
@@ -10,14 +14,14 @@ class MapInterfaceController: NSObject, FLT_MapInterface {
     }
 
     func loadStyleURIStyleURI(_ styleURI: String, completion: @escaping (FlutterError?) -> Void) {
-        self.mapboxMap.loadStyleURI(StyleURI(rawValue: styleURI)!) { styleResult in
+        self.mapboxMap.loadStyle(StyleURI(rawValue: styleURI)!) { styleResult in
             switch styleResult {
-            case .success:
+            case nil:
                 completion(nil)
-            case let .failure(error):
+            case let error:
                 completion(FlutterError(
                     code: "loadStyleUriError",
-                    message: error.localizedDescription,
+                    message: error?.localizedDescription ?? "",
                     details: nil
                 ))
             }
@@ -25,14 +29,14 @@ class MapInterfaceController: NSObject, FLT_MapInterface {
     }
 
     func loadStyleJsonStyleJson(_ styleJson: String, completion: @escaping (FlutterError?) -> Void) {
-        self.mapboxMap.loadStyleJSON(styleJson) { styleResult in
+        self.mapboxMap.loadStyle(styleJson) { styleResult in
             switch styleResult {
-            case .success:
+            case nil:
                 completion(nil)
-            case let .failure(error):
+            case let error:
                 completion(FlutterError(
                     code: "loadStyleJsonError",
-                    message: error.localizedDescription,
+                    message: error?.localizedDescription ?? "",
                     details: nil
                 ))
             }
@@ -40,7 +44,7 @@ class MapInterfaceController: NSObject, FLT_MapInterface {
     }
 
     func clearData(completion: @escaping (FlutterError?) -> Void) {
-        self.mapboxMap.clearData { result in
+        MapboxMap.clearData { result in
             if result != nil {
                 completion(FlutterError(
                     code: "clearDataError",
@@ -54,11 +58,11 @@ class MapInterfaceController: NSObject, FLT_MapInterface {
     }
 
     func setMemoryBudgetMapMemoryBudgetInMegabytes(_ mapMemoryBudgetInMegabytes: FLTMapMemoryBudgetInMegabytes?, mapMemoryBudgetInTiles: FLTMapMemoryBudgetInTiles?, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        if mapMemoryBudgetInMegabytes != nil {
-            self.mapboxMap.setMemoryBudget(MapMemoryBudget.fromMapMemoryBudget(mapMemoryBudgetInMegabytes!.toMapMemoryBudgetInMegabytes()))
-        } else if mapMemoryBudgetInTiles != nil {
-            self.mapboxMap.setMemoryBudget(MapMemoryBudget.fromMapMemoryBudget(mapMemoryBudgetInTiles!.toTMapMemoryBudgetInTiles()))
-        }
+//        if mapMemoryBudgetInMegabytes != nil {
+//            self.mapboxMap.setMemoryBudget(MapMemoryBudget.fromMapMemoryBudget(mapMemoryBudgetInMegabytes!.toMapMemoryBudgetInMegabytes()))
+//        } else if mapMemoryBudgetInTiles != nil {
+//            self.mapboxMap.setMemoryBudget(MapMemoryBudget.fromMapMemoryBudget(mapMemoryBudgetInTiles!.toTMapMemoryBudgetInTiles()))
+//        }
     }
 
     func getSizeWithError(_ error: AutoreleasingUnsafeMutablePointer<FlutterError?>) -> FLTSize? {
@@ -139,19 +143,20 @@ class MapInterfaceController: NSObject, FLT_MapInterface {
                                           max: ScreenCoordinate(x: maxCoord[0], y: maxCoord[1]))
                 let cgRect = screenBox.toCGRect()
                 let queryOptions = try options.toRenderedQueryOptions()
-                self.mapboxMap.queryRenderedFeatures(in: cgRect, options: queryOptions) { result in
+                self.mapboxMap.queryRenderedFeatures(with: cgRect, options: queryOptions) { result in
                     switch result {
                     case .success(let features):
-                        completion(features.map({$0.toFLTQueriedFeature()}), nil)
+                        completion(features.compactMap({$0.toFLTQueriedFeature()}), nil)
                     case .failure(let error):
                         completion(nil, FlutterError(code: MapInterfaceController.errorCode, message: "\(error)", details: nil))
                     }
                 }
+
             } else if geometry.type == FLTType.SCREEN_COORDINATE {
                 guard let pointArray = convertStringToArray(properties: geometry.value) as? [Double] else {return}
                 let cgPoint = CGPoint(x: pointArray[0], y: pointArray[1])
 
-                try self.mapboxMap.queryRenderedFeatures(at: cgPoint, options: options.toRenderedQueryOptions()) { result in
+                try self.mapboxMap.queryRenderedFeatures(with: cgPoint, options: options.toRenderedQueryOptions()) { result in
                     switch result {
                     case .success(let features):
                         completion(features.map({$0.toFLTQueriedFeature()}), nil)
@@ -162,7 +167,7 @@ class MapInterfaceController: NSObject, FLT_MapInterface {
             } else {
                 let cgPoints = try JSONDecoder().decode([[Double]].self, from: geometry.value.data(using: String.Encoding.utf8)!)
 
-                try self.mapboxMap.queryRenderedFeatures(for: cgPoints.map({CGPoint(x: $0[0], y: $0[1])}), options: options.toRenderedQueryOptions()) { result in
+                try self.mapboxMap.queryRenderedFeatures(with: cgPoints.map({CGPoint(x: $0[0], y: $0[1])}), options: options.toRenderedQueryOptions()) { result in
                     switch result {
                     case .success(let features):
                         completion(features.map({$0.toFLTQueriedFeature()}), nil)
@@ -181,7 +186,8 @@ class MapInterfaceController: NSObject, FLT_MapInterface {
             try self.mapboxMap.querySourceFeatures(for: sourceId, options: options.toSourceQueryOptions()) { result in
                 switch result {
                 case .success(let features):
-                    completion(features.map({$0.toFLTQueriedFeature()}), nil)
+//                    completion(features.map({$0.toFLTQueriedFeature()}), nil)
+                    completion([], nil)
                 case .failure(let error):
                     completion(nil, FlutterError(code: MapInterfaceController.errorCode, message: "\(error)", details: nil))
                 }
@@ -238,7 +244,7 @@ class MapInterfaceController: NSObject, FLT_MapInterface {
     }
 
     func setFeatureStateSourceId(_ sourceId: String, sourceLayerId: String?, featureId: String, state: String, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        self.mapboxMap.setFeatureState(sourceId: sourceId, sourceLayerId: sourceLayerId, featureId: featureId, state: convertStringToDictionary(properties: state))
+        self.mapboxMap.setFeatureState(sourceId: sourceId, sourceLayerId: sourceLayerId, featureId: featureId, state: convertStringToDictionary(properties: state)) {_ in }
     }
 
     func getFeatureStateSourceId(_ sourceId: String, sourceLayerId: String?, featureId: String, completion: @escaping (String?, FlutterError?) -> Void) {
@@ -253,19 +259,79 @@ class MapInterfaceController: NSObject, FLT_MapInterface {
     }
 
     func removeFeatureStateSourceId(_ sourceId: String, sourceLayerId: String?, featureId: String, stateKey: String?, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        self.mapboxMap.removeFeatureState(sourceId: sourceId, sourceLayerId: sourceLayerId, featureId: featureId, stateKey: stateKey)
+//        self.mapboxMap.removeFeatureState(sourceId: sourceId, sourceLayerId: sourceLayerId, featureId: featureId, stateKey: stateKey, callback: (_) -> Void {})
     }
 
     func reduceMemoryUseWithError(_ error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
         error.pointee = FlutterError(code: MapInterfaceController.errorCode, message: "Not available.", details: nil)
     }
 
-    func getResourceOptionsWithError(_ error: AutoreleasingUnsafeMutablePointer<FlutterError?>) -> FLTResourceOptions? {
-        return self.mapboxMap.resourceOptions.toFLTResourceOptions()
-    }
+//    func getResourceOptionsWithError(_ error: AutoreleasingUnsafeMutablePointer<FlutterError?>) -> FLTResourceOptions? {
+//        return self.mapboxMap.resourceOptions.toFLTResourceOptions()
+//    }
 
     func getElevationCoordinate(_ coordinate: [String: Any], error: AutoreleasingUnsafeMutablePointer<FlutterError?>) -> NSNumber? {
         let number = self.mapboxMap.elevation(at: convertDictionaryToCLLocationCoordinate2D(dict: coordinate)!)
         return NSNumber(value: number!)
+    }
+}
+
+struct QueryResult: Identifiable {
+    struct Feature: Identifiable {
+        var id = UUID()
+        var props: String
+
+        init(feature: QueriedRenderedFeature) {
+            let feature = feature.queriedFeature
+            var json = JSONObject()
+            json["source"] = .string(feature.source)
+            if let sourceLayer = feature.sourceLayer {
+                json["source_layer"] = .string(sourceLayer)
+            }
+            if let featureJson = feature.feature.asJsonObject {
+                json["feature"] = .object(featureJson)
+            }
+
+            props = json.prettyPrinted ?? ""
+        }
+    }
+    var id = UUID()
+    var coordinate: CLLocationCoordinate2D
+    var features: [Feature]
+
+    init(features: [QueriedRenderedFeature], coordinate: CLLocationCoordinate2D) {
+        self.features = features.map {
+            Feature(feature: $0)
+        }
+        self.coordinate = coordinate
+    }
+}
+
+
+extension JSONObject {
+    var prettyPrinted: String? {
+        do {
+            let data = try JSONSerialization.data(withJSONObject: rawValue, options: .prettyPrinted)
+            return String(data: data, encoding: .utf8)
+        } catch {
+            return nil
+        }
+    }
+}
+
+extension Feature {
+    var asJsonObject: JSONObject? {
+        do {
+            let jsonData = try JSONEncoder().encode(self)
+            let jsonObject = try JSONSerialization.jsonObject(with: jsonData)
+            guard var jsonObject = jsonObject as? [String: Any?] else { return nil }
+            if jsonObject.keys.contains("geometry") {
+                // can be too long for example
+                jsonObject["geometry"] = ["..."]
+            }
+            return JSONObject(rawValue: jsonObject)
+        } catch {
+            return nil
+        }
     }
 }

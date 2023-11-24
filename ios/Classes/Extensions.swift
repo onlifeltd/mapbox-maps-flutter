@@ -1,19 +1,22 @@
 import Foundation
 import MapboxMaps
 
+import CoreGraphics
+import CoreLocation
+
 let COORDINATES = "coordinates"
 // FLT to Mapbox
-extension FLTMapMemoryBudgetInMegabytes {
-    func toMapMemoryBudgetInMegabytes() -> MapMemoryBudgetInMegabytes {
-        return MapMemoryBudgetInMegabytes.init(size: size.uint64Value)
-    }
-}
-
-extension FLTMapMemoryBudgetInTiles {
-    func toTMapMemoryBudgetInTiles() -> MapMemoryBudgetInTiles {
-        return MapMemoryBudgetInTiles.init(size: size.uint64Value)
-    }
-}
+//extension FLTMapMemoryBudgetInMegabytes {
+//    func toMapMemoryBudgetInMegabytes() -> MapMemoryBudgetInMegabytes {
+//        return MapMemoryBudgetInMegabytes.init(size: size.uint64Value)
+//    }
+//}
+//
+//extension FLTMapMemoryBudgetInTiles {
+//    func toTMapMemoryBudgetInTiles() -> MapMemoryBudgetInTiles {
+//        return MapMemoryBudgetInTiles.init(size: size.uint64Value)
+//    }
+//}
 
 extension FLTSourceQueryOptions {
     func toSourceQueryOptions() throws -> SourceQueryOptions {
@@ -86,6 +89,12 @@ extension FLTCoordinateBounds {
         let northeast = convertDictionaryToCLLocationCoordinate2D(dict: self.northeast)
         return CoordinateBounds(southwest: southwest!, northeast: northeast!)
     }
+
+    func toLocationCoordinate2D() -> [CLLocationCoordinate2D] {
+        let southwest = convertDictionaryToCLLocationCoordinate2D(dict: self.southwest)
+        let northeast = convertDictionaryToCLLocationCoordinate2D(dict: self.northeast)
+        return [southwest!, northeast!]
+}
 }
 
 extension FLTCanonicalTileID {
@@ -138,29 +147,48 @@ extension FeatureExtensionValue {
         return FLTFeatureExtensionValue.make(withValue: resultValue, featureCollection: featureCollection)
     }
 }
+
+
+//extension QueriedSourceFeature {
+//    func toFLTQueriedFeature() -> FLTQueriedFeature {
+//        let stateString = convertDictionaryToString(dict: state as? [String: Any])
+//        return FLTQueriedFeature.make(withFeature: feature.toMap(), source: source, sourceLayer: sourceLayer, state: stateString)
+//    }
+//}
+
 extension QueriedFeature {
     func toFLTQueriedFeature() -> FLTQueriedFeature {
         let stateString = convertDictionaryToString(dict: state as? [String: Any])
         return FLTQueriedFeature.make(withFeature: feature.toMap(), source: source, sourceLayer: sourceLayer, state: stateString)
     }
 }
+
+extension QueriedRenderedFeature {
+    func toFLTQueriedFeature() -> FLTQueriedFeature {
+        let stateString = convertDictionaryToString(dict: queriedFeature.state as? [String: Any])
+        return FLTQueriedFeature.make(withFeature: queriedFeature.feature.toMap(), source: queriedFeature.source, sourceLayer: queriedFeature.sourceLayer, state: "")
+    }
+}
+
 extension MercatorCoordinate {
     func toFLTMercatorCoordinate() -> FLTMercatorCoordinate {
         return FLTMercatorCoordinate.makeWith(x: NSNumber(value: x), y: NSNumber(value: y))
     }
 }
-extension ResourceOptions {
-    func toFLTResourceOptions() -> FLTResourceOptions {
-        let data = FLTTileStoreUsageMode(rawValue: UInt(self.tileStoreUsageMode.rawValue))
-        return FLTResourceOptions.make(
-            withAccessToken: self.accessToken,
-            baseURL: self.baseURL?.absoluteString,
-            dataPath: self.dataPathURL?.absoluteString,
-            assetPath: self.assetPathURL?.absoluteString,
-            tileStoreUsageMode: .init(value: data!)
-        )
-    }
-}
+
+//extension ResourceOptions {
+//    func toFLTResourceOptions() -> FLTResourceOptions {
+//        let data = FLTTileStoreUsageMode(rawValue: UInt(self.tileStoreUsageMode.rawValue))
+//        return FLTResourceOptions.make(
+//            withAccessToken: self.accessToken,
+//            baseURL: self.baseURL?.absoluteString,
+//            dataPath: self.dataPathURL?.absoluteString,
+//            assetPath: self.assetPathURL?.absoluteString,
+//            tileStoreUsageMode: .init(value: data!)
+//        )
+//    }
+//}
+
 extension MapDebugOptions {
     func toFLTMapDebugOptions() -> FLTMapDebugOptions {
         let data = FLTMapDebugOptionsData(rawValue: UInt(self.rawValue))!
@@ -211,7 +239,7 @@ extension CoordinateBoundsZoom {
 }
 extension CoordinateBounds {
     func toFLTCoordinateBounds() -> FLTCoordinateBounds {
-        return FLTCoordinateBounds.make(withSouthwest: self.southwest.toDict(), northeast: self.northeast.toDict(), infiniteBounds: NSNumber(value: self.isInfiniteBounds))
+        return FLTCoordinateBounds.make(withSouthwest: self.southwest.toDict(), northeast: self.northeast.toDict(), infiniteBounds: NSNumber(value: 0))
     }
 }
 extension CameraOptions {
@@ -403,4 +431,24 @@ extension UIColor {
              return 0
          }
      }
+}
+
+extension NSNumber {
+
+    /// Converts an `NSNumber` to a `CGFloat` value from its `Double` representation.
+    internal var CGFloat: CGFloat {
+        CoreGraphics.CGFloat(doubleValue)
+    }
+
+    /// Converts the `Float` value of an `NSNumber` to a `CLLocationDirection` representation.
+    internal var CLLocationDirection: CLLocationDirection {
+        CoreLocation.CLLocationDirection(doubleValue)
+    }
+
+    // Useful for converting between NSNumbers and Core enums
+    internal func intValueAsRawRepresentable<T>() -> T? where
+        T: RawRepresentable,
+        T.RawValue == Int {
+        return T(rawValue: intValue)
+    }
 }

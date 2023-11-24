@@ -13,26 +13,25 @@ class MapboxMapFactory: NSObject, FlutterPlatformViewFactory {
         return FlutterStandardMessageCodec.sharedInstance()
     }
 
-    private func createResourceOptions(args: [String: Any]) -> ResourceOptions {
-        var resourceOptions = ResourceOptions(accessToken: "")
+    private func createResourceOptions(args: [String: Any]) -> Void {
+//        var resourceOptions = ResourceOptions(accessToken: "")
         if let resourceOptionsMap = args["resourceOptions"] as? [Any] {
             if let token = resourceOptionsMap[0] as? String {
-                resourceOptions.accessToken = token
+                MapboxOptions.accessToken = token
             }
-            if let baseURL = resourceOptionsMap[1] as? String {
-                resourceOptions.baseURL = URL(string: baseURL)
+            if let baseString = resourceOptionsMap[1] as? String, let baseURL = URL(string: baseString) {
+                MapboxMapsOptions.baseURL = baseURL
             }
-            if let dataPath = resourceOptionsMap[2] as? String {
-                resourceOptions.dataPathURL = URL(string: dataPath)
+            if let dataPath = resourceOptionsMap[2] as? String, let dataPathUrl = URL(string: dataPath) {
+                MapboxMapsOptions.dataPath = dataPathUrl
             }
-            if let assetPath = resourceOptionsMap[3] as? String {
-                resourceOptions.assetPathURL = URL(string: assetPath)
+            if let assetPath = resourceOptionsMap[3] as? String, let assetPathUrl = URL(string: assetPath) {
+                MapboxMapsOptions.assetPath = assetPathUrl
             }
             if let tileStoreUsageMode = resourceOptionsMap[4] as? Int {
-                resourceOptions.tileStoreUsageMode = TileStoreUsageMode(rawValue: tileStoreUsageMode)!
+                MapboxMapsOptions.tileStoreUsageMode = TileStoreUsageMode(rawValue: tileStoreUsageMode)!
             }
         }
-        return resourceOptions
     }
 
     private func createGlyphsRasterizationOptions(args: [Any]) -> GlyphsRasterizationOptions {
@@ -159,7 +158,10 @@ class MapboxMapFactory: NSObject, FlutterPlatformViewFactory {
         if let types = args["eventTypes"] as? [String] {
             eventTypes = types
         }
-        mapInitOptions = MapInitOptions(resourceOptions: createResourceOptions(args: args),
+        
+        createResourceOptions(args: args)
+
+        mapInitOptions = MapInitOptions(
                                         mapOptions: createMapOptions(args: args),
                                         cameraOptions: createCameraOptions(args: args),
                                         styleURI: styleURI
@@ -172,6 +174,9 @@ class MapboxMapFactory: NSObject, FlutterPlatformViewFactory {
         if let suffix = args["channelSuffix"] as? Int {
             channelSuffix = suffix
         }
+
+        print("MapboxMapController \(mapInitOptions)")
+        print("arguments \(args)")
 
         return MapboxMapController(
             withFrame: frame,

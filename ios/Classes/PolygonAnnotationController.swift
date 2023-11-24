@@ -161,7 +161,7 @@ func getFillTranslateManagerId(_ managerId: String, completion: @escaping ( [NSN
 func setFillTranslateAnchorManagerId(_ managerId: String, fillTranslateAnchor: FLTFillTranslateAnchor, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PolygonAnnotationManager {
-                manager.fillTranslateAnchor = FillTranslateAnchor.allCases[Int(fillTranslateAnchor.rawValue)]
+                manager.fillTranslateAnchor = FillTranslateAnchor.map // allCases[Int(fillTranslateAnchor.rawValue)]
 
                 completion(nil)
             } else {
@@ -176,7 +176,7 @@ func getFillTranslateAnchorManagerId(_ managerId: String, completion: @escaping 
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PolygonAnnotationManager {
                if let fillTranslateAnchor = manager.fillTranslateAnchor {
-                let index = FillTranslateAnchor.allCases.firstIndex(of: fillTranslateAnchor)!
+                let index = 0 //FillTranslateAnchor.allCases.firstIndex(of: fillTranslateAnchor)!
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)

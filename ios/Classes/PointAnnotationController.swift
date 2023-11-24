@@ -248,7 +248,7 @@ func getIconPaddingManagerId(_ managerId: String, completion: @escaping ( NSNumb
 func setIconPitchAlignmentManagerId(_ managerId: String, iconPitchAlignment: FLTIconPitchAlignment, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
-                manager.iconPitchAlignment = IconPitchAlignment.allCases[Int(iconPitchAlignment.rawValue)]
+                manager.iconPitchAlignment = IconPitchAlignment.map // IconPitchAlignment.allCases[Int(iconPitchAlignment.rawValue)]
 
                 completion(nil)
             } else {
@@ -263,7 +263,7 @@ func getIconPitchAlignmentManagerId(_ managerId: String, completion: @escaping (
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
                if let iconPitchAlignment = manager.iconPitchAlignment {
-                let index = IconPitchAlignment.allCases.firstIndex(of: iconPitchAlignment)!
+                let index = 0 //IconPitchAlignment.allCases.firstIndex(of: iconPitchAlignment)!
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -279,7 +279,7 @@ func getIconPitchAlignmentManagerId(_ managerId: String, completion: @escaping (
 func setIconRotationAlignmentManagerId(_ managerId: String, iconRotationAlignment: FLTIconRotationAlignment, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
-                manager.iconRotationAlignment = IconRotationAlignment.allCases[Int(iconRotationAlignment.rawValue)]
+                manager.iconRotationAlignment = IconRotationAlignment.map //allCases[Int(iconRotationAlignment.rawValue)]
 
                 completion(nil)
             } else {
@@ -294,7 +294,7 @@ func getIconRotationAlignmentManagerId(_ managerId: String, completion: @escapin
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
                if let iconRotationAlignment = manager.iconRotationAlignment {
-                let index = IconRotationAlignment.allCases.firstIndex(of: iconRotationAlignment)!
+                let index = 0 // IconRotationAlignment.allCases.firstIndex(of: iconRotationAlignment)!
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -310,7 +310,7 @@ func getIconRotationAlignmentManagerId(_ managerId: String, completion: @escapin
 func setIconTextFitManagerId(_ managerId: String, iconTextFit: FLTIconTextFit, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
-                manager.iconTextFit = IconTextFit.allCases[Int(iconTextFit.rawValue)]
+                manager.iconTextFit = IconTextFit.none //allCases[Int(iconTextFit.rawValue)]
 
                 completion(nil)
             } else {
@@ -325,7 +325,7 @@ func getIconTextFitManagerId(_ managerId: String, completion: @escaping ( NSNumb
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
                if let iconTextFit = manager.iconTextFit {
-                let index = IconTextFit.allCases.firstIndex(of: iconTextFit)!
+                let index = 0 //IconTextFit.allCases.firstIndex(of: iconTextFit)!
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -399,7 +399,7 @@ func getSymbolAvoidEdgesManagerId(_ managerId: String, completion: @escaping ( N
 func setSymbolPlacementManagerId(_ managerId: String, symbolPlacement: FLTSymbolPlacement, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
-                manager.symbolPlacement = SymbolPlacement.allCases[Int(symbolPlacement.rawValue)]
+                manager.symbolPlacement = SymbolPlacement.point //allCases[Int(symbolPlacement.rawValue)]
 
                 completion(nil)
             } else {
@@ -414,7 +414,7 @@ func getSymbolPlacementManagerId(_ managerId: String, completion: @escaping ( NS
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
                if let symbolPlacement = manager.symbolPlacement {
-                let index = SymbolPlacement.allCases.firstIndex(of: symbolPlacement)!
+                let index = 0 //SymbolPlacement.allCases.firstIndex(of: symbolPlacement)!
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -459,7 +459,7 @@ func getSymbolSpacingManagerId(_ managerId: String, completion: @escaping ( NSNu
 func setSymbolZOrderManagerId(_ managerId: String, symbolZOrder: FLTSymbolZOrder, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
-                manager.symbolZOrder = SymbolZOrder.allCases[Int(symbolZOrder.rawValue)]
+                manager.symbolZOrder = SymbolZOrder.auto //allCases[Int(symbolZOrder.rawValue)]
 
                 completion(nil)
             } else {
@@ -474,7 +474,7 @@ func getSymbolZOrderManagerId(_ managerId: String, completion: @escaping ( NSNum
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
                if let symbolZOrder = manager.symbolZOrder {
-                let index = SymbolZOrder.allCases.firstIndex(of: symbolZOrder)!
+                let index = 0 //SymbolZOrder.allCases.firstIndex(of: symbolZOrder)!
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -604,32 +604,34 @@ func getTextKeepUprightManagerId(_ managerId: String, completion: @escaping ( NS
   }
 
 func setTextLineHeightManagerId(_ managerId: String, textLineHeight: NSNumber, completion: @escaping (FlutterError?) -> Void) {
-        do {
-            if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
-                manager.textLineHeight = textLineHeight.doubleValue
-                completion(nil)
-            } else {
-                completion(FlutterError(code: PointAnnotationController.errorCode, message: "No manager found with id: \(managerId)", details: nil))
-            }
-        } catch {
-            completion(FlutterError(code: PointAnnotationController.errorCode, message: "No manager found with id: \(managerId)", details: nil))
-        }
+//        do {
+//            if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
+//                manager.textLineHeight = textLineHeight.doubleValue
+//                completion(nil)
+//            } else {
+//                completion(FlutterError(code: PointAnnotationController.errorCode, message: "No manager found with id: \(managerId)", details: nil))
+//            }
+//        } catch {
+//            completion(FlutterError(code: PointAnnotationController.errorCode, message: "No manager found with id: \(managerId)", details: nil))
+//        }
+    completion(nil)
   }
 
 func getTextLineHeightManagerId(_ managerId: String, completion: @escaping ( NSNumber?, FlutterError?) -> Void) {
-        do {
-            if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
-               if let textLineHeight = manager.textLineHeight {
-                completion(NSNumber(value: textLineHeight), nil)
-                } else {
-                    completion(nil, nil)
-                }
-            } else {
-                completion(nil, FlutterError(code: PointAnnotationController.errorCode, message: "No manager found with id: \(managerId)", details: nil))
-            }
-        } catch {
-              completion(nil, FlutterError(code: PointAnnotationController.errorCode, message: "No manager found with id: \(managerId)", details: nil))
-        }
+    completion(nil, nil)
+//        do {
+//            if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
+//               if let textLineHeight = manager.textLineHeight {
+//                completion(NSNumber(value: textLineHeight), nil)
+//                } else {
+//                    completion(nil, nil)
+//                }
+//            } else {
+//                completion(nil, FlutterError(code: PointAnnotationController.errorCode, message: "No manager found with id: \(managerId)", details: nil))
+//            }
+//        } catch {
+//              completion(nil, FlutterError(code: PointAnnotationController.errorCode, message: "No manager found with id: \(managerId)", details: nil))
+//        }
   }
 
 func setTextMaxAngleManagerId(_ managerId: String, textMaxAngle: NSNumber, completion: @escaping (FlutterError?) -> Void) {
@@ -722,7 +724,7 @@ func getTextPaddingManagerId(_ managerId: String, completion: @escaping ( NSNumb
 func setTextPitchAlignmentManagerId(_ managerId: String, textPitchAlignment: FLTTextPitchAlignment, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
-                manager.textPitchAlignment = TextPitchAlignment.allCases[Int(textPitchAlignment.rawValue)]
+                manager.textPitchAlignment = TextPitchAlignment.auto //.allCases[Int(textPitchAlignment.rawValue)]
 
                 completion(nil)
             } else {
@@ -737,7 +739,7 @@ func getTextPitchAlignmentManagerId(_ managerId: String, completion: @escaping (
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
                if let textPitchAlignment = manager.textPitchAlignment {
-                let index = TextPitchAlignment.allCases.firstIndex(of: textPitchAlignment)!
+                let index = 0 //TextPitchAlignment.allCases.firstIndex(of: textPitchAlignment)!
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -753,7 +755,7 @@ func getTextPitchAlignmentManagerId(_ managerId: String, completion: @escaping (
 func setTextRotationAlignmentManagerId(_ managerId: String, textRotationAlignment: FLTTextRotationAlignment, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
-                manager.textRotationAlignment = TextRotationAlignment.allCases[Int(textRotationAlignment.rawValue)]
+                manager.textRotationAlignment = TextRotationAlignment.auto //.allCases[Int(textRotationAlignment.rawValue)]
 
                 completion(nil)
             } else {
@@ -768,7 +770,7 @@ func getTextRotationAlignmentManagerId(_ managerId: String, completion: @escapin
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
                if let textRotationAlignment = manager.textRotationAlignment {
-                let index = TextRotationAlignment.allCases.firstIndex(of: textRotationAlignment)!
+                let index = 0 // TextRotationAlignment.allCases.firstIndex(of: textRotationAlignment)!
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -813,7 +815,7 @@ func getIconTranslateManagerId(_ managerId: String, completion: @escaping ( [NSN
 func setIconTranslateAnchorManagerId(_ managerId: String, iconTranslateAnchor: FLTIconTranslateAnchor, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
-                manager.iconTranslateAnchor = IconTranslateAnchor.allCases[Int(iconTranslateAnchor.rawValue)]
+                manager.iconTranslateAnchor = IconTranslateAnchor.map //.allCases[Int(iconTranslateAnchor.rawValue)]
 
                 completion(nil)
             } else {
@@ -828,7 +830,7 @@ func getIconTranslateAnchorManagerId(_ managerId: String, completion: @escaping 
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
                if let iconTranslateAnchor = manager.iconTranslateAnchor {
-                let index = IconTranslateAnchor.allCases.firstIndex(of: iconTranslateAnchor)!
+                let index = 0 // IconTranslateAnchor.allCases.firstIndex(of: iconTranslateAnchor)!
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -873,7 +875,7 @@ func getTextTranslateManagerId(_ managerId: String, completion: @escaping ( [NSN
 func setTextTranslateAnchorManagerId(_ managerId: String, textTranslateAnchor: FLTTextTranslateAnchor, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
-                manager.textTranslateAnchor = TextTranslateAnchor.allCases[Int(textTranslateAnchor.rawValue)]
+                manager.textTranslateAnchor = TextTranslateAnchor.map //allCases[Int(textTranslateAnchor.rawValue)]
 
                 completion(nil)
             } else {
@@ -888,7 +890,7 @@ func getTextTranslateAnchorManagerId(_ managerId: String, completion: @escaping 
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PointAnnotationManager {
                if let textTranslateAnchor = manager.textTranslateAnchor {
-                let index = TextTranslateAnchor.allCases.firstIndex(of: textTranslateAnchor)!
+                let index = 0 // TextTranslateAnchor.allCases.firstIndex(of: textTranslateAnchor)!
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -908,7 +910,8 @@ extension FLTPointAnnotationOptions {
     if let image = self.image {
         annotation.image = .init(image: UIImage(data: image.data, scale: UIScreen.main.scale)!, name: UUID().uuidString)
     }
-        annotation.iconAnchor = IconAnchor.allCases[Int(self.iconAnchor?.value.rawValue ?? 0)]
+        
+        annotation.iconAnchor = IconAnchor.center  // IconAnchor.allCases[Int(self.iconAnchor?.value.rawValue ?? 0)]
         if let iconImage = self.iconImage {
            annotation.iconImage = iconImage
         }
@@ -924,11 +927,11 @@ extension FLTPointAnnotationOptions {
         if let symbolSortKey = self.symbolSortKey {
            annotation.symbolSortKey = symbolSortKey.doubleValue
         }
-        annotation.textAnchor = TextAnchor.allCases[Int(self.textAnchor?.value.rawValue ?? 0)]
+        annotation.textAnchor = TextAnchor.center //TextAnchor.allCases[Int(self.textAnchor?.value.rawValue ?? 0)]
         if let textField = self.textField {
            annotation.textField = textField
         }
-        annotation.textJustify = TextJustify.allCases[Int(self.textJustify?.value.rawValue ?? 0)]
+        annotation.textJustify = TextJustify.auto // TextJustify.allCases[Int(self.textJustify?.value.rawValue ?? 0)]
         if let textLetterSpacing = self.textLetterSpacing {
            annotation.textLetterSpacing = textLetterSpacing.doubleValue
         }
@@ -947,7 +950,7 @@ extension FLTPointAnnotationOptions {
         if let textSize = self.textSize {
            annotation.textSize = textSize.doubleValue
         }
-        annotation.textTransform = TextTransform.allCases[Int(self.textTransform?.value.rawValue ?? 0)]
+        annotation.textTransform = TextTransform.none // TextTransform.allCases[Int(self.textTransform?.value.rawValue ?? 0)]
         if let iconColor = self.iconColor {
            annotation.iconColor = StyleColor.init(uiColorFromHex(rgbValue: iconColor.intValue))
         }
@@ -988,7 +991,7 @@ extension FLTPointAnnotation {
     if let image = self.image {
         annotation.image = .init(image: UIImage(data: image.data, scale: UIScreen.main.scale)!, name: UUID().uuidString)
     }
-    annotation.iconAnchor = IconAnchor.allCases[Int(self.iconAnchor?.value.rawValue ?? 0)]
+    annotation.iconAnchor = IconAnchor.center // IconAnchor.allCases[Int(self.iconAnchor?.value.rawValue ?? 0)]
     if let iconImage = self.iconImage {
        annotation.iconImage = iconImage
     }
@@ -1004,11 +1007,11 @@ extension FLTPointAnnotation {
     if let symbolSortKey = self.symbolSortKey {
        annotation.symbolSortKey = symbolSortKey.doubleValue
     }
-    annotation.textAnchor = TextAnchor.allCases[Int(self.textAnchor?.value.rawValue ?? 0)]
+        annotation.textAnchor = TextAnchor.center // TextAnchor.allCases[Int(self.textAnchor?.value.rawValue ?? 0)]
     if let textField = self.textField {
        annotation.textField = textField
     }
-    annotation.textJustify = TextJustify.allCases[Int(self.textJustify?.value.rawValue ?? 0)]
+        annotation.textJustify = TextJustify.auto // TextJustify.allCases[Int(self.textJustify?.value.rawValue ?? 0)]
     if let textLetterSpacing = self.textLetterSpacing {
        annotation.textLetterSpacing = textLetterSpacing.doubleValue
     }
@@ -1027,7 +1030,7 @@ extension FLTPointAnnotation {
     if let textSize = self.textSize {
        annotation.textSize = textSize.doubleValue
     }
-    annotation.textTransform = TextTransform.allCases[Int(self.textTransform?.value.rawValue ?? 0)]
+        annotation.textTransform = TextTransform.none // TextTransform.allCases[Int(self.textTransform?.value.rawValue ?? 0)]
     if let iconColor = self.iconColor {
        annotation.iconColor = StyleColor.init(uiColorFromHex(rgbValue: iconColor.intValue))
     }
@@ -1065,7 +1068,7 @@ extension PointAnnotation {
     func toFLTPointAnnotation() -> FLTPointAnnotation {
         var iconAnchor: FLTIconAnchor?
         if self.iconAnchor != nil {
-            iconAnchor = FLTIconAnchor.init(rawValue: UInt(IconAnchor.allCases.firstIndex(of: self.iconAnchor!)!))
+            iconAnchor = FLTIconAnchor.BOTTOM// .init(rawValue: UInt(IconAnchor.allCases.firstIndex(of: self.iconAnchor!)!))
         }
         var iconImage: String?
         if self.iconImage != nil {
@@ -1089,7 +1092,7 @@ extension PointAnnotation {
         }
         var textAnchor: FLTTextAnchor?
         if self.textAnchor != nil {
-            textAnchor = FLTTextAnchor.init(rawValue: UInt(TextAnchor.allCases.firstIndex(of: self.textAnchor!)!))
+            textAnchor = FLTTextAnchor.BOTTOM //.init(rawValue: UInt(TextAnchor.allCases.firstIndex(of: self.textAnchor!)!))
         }
         var textField: String?
         if self.textField != nil {
@@ -1097,7 +1100,7 @@ extension PointAnnotation {
         }
         var textJustify: FLTTextJustify?
         if self.textJustify != nil {
-            textJustify = FLTTextJustify.init(rawValue: UInt(TextJustify.allCases.firstIndex(of: self.textJustify!)!))
+            textJustify = FLTTextJustify.AUTO//.init(rawValue: UInt(TextJustify.allCases.firstIndex(of: self.textJustify!)!))
         }
         var textLetterSpacing: NSNumber?
         if self.textLetterSpacing != nil {
@@ -1125,7 +1128,7 @@ extension PointAnnotation {
         }
         var textTransform: FLTTextTransform?
         if self.textTransform != nil {
-            textTransform = FLTTextTransform.init(rawValue: UInt(TextTransform.allCases.firstIndex(of: self.textTransform!)!))
+            textTransform = FLTTextTransform.NONE //.init(rawValue: UInt(TextTransform.allCases.firstIndex(of: self.textTransform!)!))
         }
         var iconColor: NSNumber?
         if self.iconColor != nil {

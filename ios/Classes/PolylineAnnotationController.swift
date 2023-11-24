@@ -103,7 +103,7 @@ class PolylineAnnotationController: NSObject, FLT_PolylineAnnotationMessager {
 func setLineCapManagerId(_ managerId: String, lineCap: FLTLineCap, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PolylineAnnotationManager {
-                manager.lineCap = LineCap.allCases[Int(lineCap.rawValue)]
+//                manager.lineCap = LineCap.allCases[Int(lineCap.rawValue)]
 
                 completion(nil)
             } else {
@@ -118,7 +118,7 @@ func getLineCapManagerId(_ managerId: String, completion: @escaping ( NSNumber?,
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PolylineAnnotationManager {
                if let lineCap = manager.lineCap {
-                let index = LineCap.allCases.firstIndex(of: lineCap)!
+                let index = 0//LineCap.allCases.firstIndex(of: lineCap)!
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -250,7 +250,8 @@ func getLineTranslateManagerId(_ managerId: String, completion: @escaping ( [NSN
 func setLineTranslateAnchorManagerId(_ managerId: String, lineTranslateAnchor: FLTLineTranslateAnchor, completion: @escaping (FlutterError?) -> Void) {
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PolylineAnnotationManager {
-                manager.lineTranslateAnchor = LineTranslateAnchor.allCases[Int(lineTranslateAnchor.rawValue)]
+                manager.lineTranslateAnchor = LineTranslateAnchor.map
+//                LineTranslateAnchor.allCases[Int(lineTranslateAnchor.rawValue)]
 
                 completion(nil)
             } else {
@@ -265,7 +266,7 @@ func getLineTranslateAnchorManagerId(_ managerId: String, completion: @escaping 
         do {
             if let manager = try delegate?.getManager(managerId: managerId) as? PolylineAnnotationManager {
                if let lineTranslateAnchor = manager.lineTranslateAnchor {
-                let index = LineTranslateAnchor.allCases.firstIndex(of: lineTranslateAnchor)!
+                   let index = 0 //.allCases.firstIndex(of: lineTranslateAnchor)!
                 completion(NSNumber(value: index), nil)
                 } else {
                     completion(nil, nil)
@@ -311,7 +312,7 @@ func getLineTrimOffsetManagerId(_ managerId: String, completion: @escaping ( [NS
 extension FLTPolylineAnnotationOptions {
     func toPolylineAnnotation() -> PolylineAnnotation {
     var annotation = PolylineAnnotation(lineString: convertDictionaryToPolyline(dict: self.geometry!))
-        annotation.lineJoin = LineJoin.allCases[Int(self.lineJoin?.value.rawValue ?? 0)]
+        annotation.lineJoin = LineJoin.bevel //LineJoin.allCases[Int(self.lineJoin?.value.rawValue ?? 0)]
         if let lineSortKey = self.lineSortKey {
            annotation.lineSortKey = lineSortKey.doubleValue
         }
@@ -343,7 +344,7 @@ extension FLTPolylineAnnotationOptions {
 extension FLTPolylineAnnotation {
     func toPolylineAnnotation() -> PolylineAnnotation {
     var annotation = PolylineAnnotation(id: self.id, lineString: convertDictionaryToPolyline(dict: self.geometry!))
-    annotation.lineJoin = LineJoin.allCases[Int(self.lineJoin?.value.rawValue ?? 0)]
+        annotation.lineJoin = LineJoin.bevel  //LineJoin.allCases[Int(self.lineJoin?.value.rawValue ?? 0)]
     if let lineSortKey = self.lineSortKey {
        annotation.lineSortKey = lineSortKey.doubleValue
     }
@@ -375,7 +376,8 @@ extension PolylineAnnotation {
     func toFLTPolylineAnnotation() -> FLTPolylineAnnotation {
         var lineJoin: FLTLineJoin?
         if self.lineJoin != nil {
-            lineJoin = FLTLineJoin.init(rawValue: UInt(LineJoin.allCases.firstIndex(of: self.lineJoin!)!))
+//            lineJoin = FLTLineJoin.init(rawValue: UInt(LineJoin.allCases.firstIndex(of: self.lineJoin!)!))
+            lineJoin = FLTLineJoin.init(rawValue: 0)
         }
         var lineSortKey: NSNumber?
         if self.lineSortKey != nil {

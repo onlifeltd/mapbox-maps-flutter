@@ -13,6 +13,7 @@ class StyleController: NSObject, FLTStyleManager {
     }
 
     func setStyleURIUri(_ uri: String, completion: @escaping (FlutterError?) -> Void) {
+        print("set mapboxMap.style.uri \(uri)")
         mapboxMap.style.uri = StyleURI(rawValue: uri)
         completion(nil)
     }
@@ -248,24 +249,24 @@ class StyleController: NSObject, FLTStyleManager {
     func setStyleLightProperties(_ properties: String, completion: @escaping (FlutterError?) -> Void) {
         let data = properties.data(using: String.Encoding.utf8)!
         let jsonObject = try? JSONSerialization.jsonObject(with: data, options: [])
-        do {
-            try mapboxMap.style.setLight(properties: jsonObject as? [String: Any] ?? [:])
+//        do {
+////            try mapboxMap.style.setLight(properties: jsonObject as? [String: Any] ?? [:])
             completion(nil)
-        } catch {
-            completion(FlutterError(code: StyleController.errorCode, message: "\(error)", details: nil))
-        }
+//        } catch {
+//            completion(FlutterError(code: StyleController.errorCode, message: "\(error)", details: nil))
+//        }
     }
 
     func getStyleLightPropertyProperty(_ property: String,
                                        completion: @escaping (FLTStylePropertyValue?, FlutterError?) -> Void) {
-        let lightProperty: StylePropertyValue = mapboxMap.style.lightProperty(property)
-        completion(lightProperty.toFLTStylePropertyValue(property: property), nil)
+//        let lightProperty: StylePropertyValue = mapboxMap.style.lightProperty(property)
+//        completion(lightProperty.toFLTStylePropertyValue(property: property), nil)
     }
 
     func setStyleLightPropertyProperty(_ property: String, value: Any,
                                        completion: @escaping (FlutterError?) -> Void) {
         do {
-            try mapboxMap.style.setLightProperty(property, value: value)
+//            try mapboxMap.style.setLightProperty(property, value: value)
             completion(nil)
         } catch {
             completion(FlutterError(code: StyleController.errorCode, message: "\(error)", details: nil))

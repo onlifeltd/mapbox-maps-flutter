@@ -1,18 +1,18 @@
 import Flutter
 import MapboxMaps
 import UIKit
-
-class EventsObserver: Observer {
-    var notificationHandler: (MapboxCoreMaps.Event) -> Void
-
-    init(with notificationHandler: @escaping (MapboxCoreMaps.Event) -> Void) {
-        self.notificationHandler = notificationHandler
-    }
-
-    func notify(for event: MapboxCoreMaps.Event) {
-        notificationHandler(event)
-    }
-}
+//
+//class EventsObserver: Observer {
+//    var notificationHandler: (MapboxCoreMaps.Event) -> Void
+//
+//    init(with notificationHandler: @escaping (MapboxCoreMaps.Event) -> Void) {
+//        self.notificationHandler = notificationHandler
+//    }
+//
+//    func notify(for event: MapboxCoreMaps.Event) {
+//        notificationHandler(event)
+//    }
+//}
 
 class ProxyBinaryMessenger: NSObject, FlutterBinaryMessenger {
 
@@ -49,6 +49,8 @@ class MapboxMapController: NSObject, FlutterPlatformView {
     private var annotationController: AnnotationController?
     private var gesturesController: GesturesController?
     private var proxyBinaryMessenger: ProxyBinaryMessenger
+    
+    private var cancelables = Set<AnyCancelable>()
 
     func view() -> UIView {
         return mapView
@@ -65,7 +67,7 @@ class MapboxMapController: NSObject, FlutterPlatformView {
     ) {
         self.proxyBinaryMessenger = ProxyBinaryMessenger(with: registrar.messenger(), channelSuffix: "/map_\(channelSuffix)")
 
-        HttpServiceFactory.getInstance().setInterceptorForInterceptor(HttpUseragentInterceptor(pluginVersion: pluginVersion))
+//        HttpServiceFactory.getInstance().setInterceptorForInterceptor(HttpUseragentInterceptor(pluginVersion: pluginVersion))
 
         mapView = MapView(frame: frame, mapInitOptions: mapInitOptions)
         mapboxMap = mapView.mapboxMap
@@ -116,19 +118,10 @@ class MapboxMapController: NSObject, FlutterPlatformView {
 
         annotationController = AnnotationController(withMapView: mapView)
         annotationController!.setup(messenger: proxyBinaryMessenger)
-
-        let observer = EventsObserver(with: { [weak self] (resourceEvent) in
-            guard let self = self else {
-                return
-            }
-            guard let eventData = resourceEvent.data as? [String: Any] else {
-                return
-            }
-
-            self.channel.invokeMethod(self.getEventMethodName(eventType: resourceEvent.type),
-                                      arguments: self.convertDictionaryToString(dict: eventData))
-        })
-        mapboxMap.subscribe(observer, events: eventTypes)
+        
+        eventTypes.forEach { event in
+            subscribeEvent(eventType: event)
+        }
     }
 
     func onMethodCall(methodCall: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -136,11 +129,12 @@ class MapboxMapController: NSObject, FlutterPlatformView {
         case "map#subscribe":
             guard let arguments = methodCall.arguments as? [String: Any] else { return }
             guard let eventType = arguments["event"] as? String else { return }
-            mapboxMap.onEvery(MapEvents.EventKind(rawValue: eventType)!) { (event) in
-                guard let data = event.data as? [String: Any] else {return}
-                self.channel.invokeMethod(self.getEventMethodName(eventType: eventType),
-                                          arguments: self.convertDictionaryToString(dict: data))
-            }
+            print("onMethodCall \(eventType): \(arguments)")
+//            mapboxMap.onEvery(MapEvents.EventKind(rawValue: eventType)!) { (event) in
+//                guard let data = event.data as? [String: Any] else {return}
+//                self.channel.invokeMethod(self.getEventMethodName(eventType: eventType),
+//                                          arguments: self.convertDictionaryToString(dict: data))
+//            }
             result(nil)
         case "annotation#create_manager":
             annotationController!.handleCreateManager(methodCall: methodCall, result: result)
@@ -155,6 +149,31 @@ class MapboxMapController: NSObject, FlutterPlatformView {
         default:
             result(FlutterMethodNotImplemented)
         }
+    }
+    
+    private func subscribeEvent(eventType: String) {
+        print("event#\(eventType)")
+        let invokeMethod =  { [weak self] (eventData: [String: Any]) in
+            guard let self = self else {
+                return
+            }
+
+            self.channel.invokeMethod(self.getEventMethodName(eventType: eventType),
+                                      arguments: self.convertDictionaryToString(dict: eventData))
+        }
+        
+        switch eventType {
+        case "render-frame-started":
+            mapboxMap.onRenderFrameStarted.observe { event in
+                invokeMethod(["begin": Int(event.timestamp.timeIntervalSince1970), "end": 0])
+            }.store(in: &cancelables);
+        case "style-loaded":
+            mapboxMap.onStyleLoaded.observe { event in
+                invokeMethod(["begin": Int(event.timeInterval.begin.timeIntervalSince1970), "end": Int(event.timeInterval.end.timeIntervalSince1970)])
+            }.store(in: &cancelables);
+        default: break
+        }
+        
     }
 
     private func getEventMethodName(eventType: String) -> String {
@@ -179,28 +198,28 @@ class MapboxMapController: NSObject, FlutterPlatformView {
         return result
     }
 
-    final class HttpUseragentInterceptor: HttpServiceInterceptorInterface {
-
-        private var pluginVersion: String
-
-        init(pluginVersion: String) {
-            self.pluginVersion = pluginVersion
-        }
-
-        func onRequest(for request: HttpRequest) -> HttpRequest {
-            if let oldUseragent = request.headers[HttpHeaders.userAgent] {
-                request.headers[HttpHeaders.userAgent] = "\(oldUseragent) FlutterPlugin/\(self.pluginVersion)"
-            }
-
-            return request
-        }
-
-        func onDownload(forDownload download: DownloadOptions) -> DownloadOptions {
-            return download
-        }
-
-        func onResponse(for response: HttpResponse) -> HttpResponse {
-            return response
-        }
-    }
+//    final class HttpUseragentInterceptor: HttpServiceInterceptorInterface {
+//
+//        private var pluginVersion: String
+//
+//        init(pluginVersion: String) {
+//            self.pluginVersion = pluginVersion
+//        }
+//
+//        func onRequest(for request: HttpRequest) -> HttpRequest {
+//            if let oldUseragent = request.headers[HttpHeaders.userAgent] {
+//                request.headers[HttpHeaders.userAgent] = "\(oldUseragent) FlutterPlugin/\(self.pluginVersion)"
+//            }
+//
+//            return request
+//        }
+//
+//        func onDownload(forDownload download: DownloadOptions) -> DownloadOptions {
+//            return download
+//        }
+//
+//        func onResponse(for response: HttpResponse) -> HttpResponse {
+//            return response
+//        }
+//    }
 }

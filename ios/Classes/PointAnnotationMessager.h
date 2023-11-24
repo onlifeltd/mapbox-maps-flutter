@@ -218,7 +218,7 @@ typedef NS_ENUM(NSUInteger, FLTTextTransform) {
 typedef NS_ENUM(NSUInteger, FLTTextVariableAnchor) {
   /// The center of the text is placed closest to the anchor.
   FLTTextVariableAnchorCENTER = 0,
-  /// The left side of the text is placed closest to the anchor.
+/// The left side of the text is placed closest to the anchor.
   FLTTextVariableAnchorLEFT = 1,
   /// The right side of the text is placed closest to the anchor.
   FLTTextVariableAnchorRIGHT = 2,
