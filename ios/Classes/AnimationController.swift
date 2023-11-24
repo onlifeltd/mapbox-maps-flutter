@@ -6,10 +6,17 @@ class AnimationController: NSObject, FLT_AnimationManager {
 
     func ease(to cameraOptions: FLTCameraOptions, mapAnimationOptions: FLTMapAnimationOptions?, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
         var cameraDuration = 1.0
+        var curve = UIView.AnimationCurve.easeOut
+        
         if mapAnimationOptions != nil && mapAnimationOptions!.duration != nil {
             cameraDuration = mapAnimationOptions!.duration!.doubleValue / 1000
         }
-        cancelable = self.mapView.camera.ease(to: cameraOptions.toCameraOptions(), duration: cameraDuration)
+    
+        if mapAnimationOptions != nil && mapAnimationOptions!.curve != nil {
+            curve = UIView.AnimationCurve(rawValue: mapAnimationOptions!.curve!.intValue) ?? curve
+        }
+        
+        cancelable = self.mapView.camera.ease(to: cameraOptions.toCameraOptions(), duration: cameraDuration, curve: curve)
     }
 
     func fly(to cameraOptions: FLTCameraOptions, mapAnimationOptions: FLTMapAnimationOptions?, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {

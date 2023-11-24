@@ -1,5 +1,5 @@
 import Flutter
-import MapboxMaps
+@_spi(Experimental) import MapboxMaps
 import UIKit
 //
 //class EventsObserver: Observer {
@@ -18,7 +18,7 @@ class ProxyBinaryMessenger: NSObject, FlutterBinaryMessenger {
 
     let channelSuffix: String
     let messenger: FlutterBinaryMessenger
-
+    
     init(with messenger: FlutterBinaryMessenger, channelSuffix: String) {
         self.messenger = messenger
         self.channelSuffix = channelSuffix
@@ -51,6 +51,25 @@ class MapboxMapController: NSObject, FlutterPlatformView {
     private var proxyBinaryMessenger: ProxyBinaryMessenger
     
     private var cancelables = Set<AnyCancelable>()
+    
+    private var lightPreset = StandardLightPreset.night
+    private var styleURI = StyleURI.standard
+    
+    private var mapStyle: MapStyle {
+        MapStyle(
+            uri: styleURI,
+            importConfigurations: [
+                .standard(
+                    importId: nil,
+                    lightPreset: lightPreset,
+                    showPointOfInterestLabels: nil,
+                    showTransitLabels: nil,
+                    showPlaceLabels: nil,
+                    showRoadLabels: nil)
+            ]
+        )
+    }
+
 
     func view() -> UIView {
         return mapView
@@ -68,10 +87,14 @@ class MapboxMapController: NSObject, FlutterPlatformView {
         self.proxyBinaryMessenger = ProxyBinaryMessenger(with: registrar.messenger(), channelSuffix: "/map_\(channelSuffix)")
 
 //        HttpServiceFactory.getInstance().setInterceptorForInterceptor(HttpUseragentInterceptor(pluginVersion: pluginVersion))
+        
+        print("mapInitOptions=\(mapInitOptions)")
+        
+//        let options = MapInitOptions(cameraOptions: CameraOptions(center: CLLocationCoordinate2D(latitude: 51.503279869185356, longitude: -0.11948701621587453), zoom: 15, bearing: 60.0, pitch: 45))
 
         mapView = MapView(frame: frame, mapInitOptions: mapInitOptions)
         mapboxMap = mapView.mapboxMap
-
+        
         self.registrar = registrar
 
         channel = FlutterMethodChannel(
@@ -80,7 +103,7 @@ class MapboxMapController: NSObject, FlutterPlatformView {
         )
 
         super.init()
-
+        
         channel.setMethodCallHandler { [weak self] in self?.onMethodCall(methodCall: $0, result: $1) }
 
         let styleController = StyleController(withMapboxMap: mapboxMap)
@@ -122,14 +145,16 @@ class MapboxMapController: NSObject, FlutterPlatformView {
         eventTypes.forEach { event in
             subscribeEvent(eventType: event)
         }
+        
+        styleURI = mapInitOptions.styleURI ?? styleURI
+        mapView.mapboxMap.mapStyle = mapStyle
     }
 
     func onMethodCall(methodCall: FlutterMethodCall, result: @escaping FlutterResult) {
         switch methodCall.method {
         case "map#subscribe":
-            guard let arguments = methodCall.arguments as? [String: Any] else { return }
-            guard let eventType = arguments["event"] as? String else { return }
-            print("onMethodCall \(eventType): \(arguments)")
+//            guard let arguments = methodCall.arguments as? [String: Any] else { return }
+//            guard let eventType = arguments["event"] as? String else { return }
 //            mapboxMap.onEvery(MapEvents.EventKind(rawValue: eventType)!) { (event) in
 //                guard let data = event.data as? [String: Any] else {return}
 //                self.channel.invokeMethod(self.getEventMethodName(eventType: eventType),
@@ -146,6 +171,8 @@ class MapboxMapController: NSObject, FlutterPlatformView {
         case "gesture#remove_listeners":
             gesturesController!.removeListeners()
             result(nil)
+        case "setStyleImportConfigProperty":
+            setStyleImportConfigProperty(methodCall: methodCall, result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
@@ -198,28 +225,13 @@ class MapboxMapController: NSObject, FlutterPlatformView {
         return result
     }
 
-//    final class HttpUseragentInterceptor: HttpServiceInterceptorInterface {
-//
-//        private var pluginVersion: String
-//
-//        init(pluginVersion: String) {
-//            self.pluginVersion = pluginVersion
-//        }
-//
-//        func onRequest(for request: HttpRequest) -> HttpRequest {
-//            if let oldUseragent = request.headers[HttpHeaders.userAgent] {
-//                request.headers[HttpHeaders.userAgent] = "\(oldUseragent) FlutterPlugin/\(self.pluginVersion)"
-//            }
-//
-//            return request
-//        }
-//
-//        func onDownload(forDownload download: DownloadOptions) -> DownloadOptions {
-//            return download
-//        }
-//
-//        func onResponse(for response: HttpResponse) -> HttpResponse {
-//            return response
-//        }
-//    }
+    private func setStyleImportConfigProperty(methodCall: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let arguments = methodCall.arguments as? [String: Any] else { return }
+        guard let config = arguments["config"] as? String else { return }
+        guard let value = arguments["value"] else { return }
+        
+        try? self.mapView.mapboxMap.setStyleImportConfigProperty(for: "basemap", config: config, value: value)
+        
+        result(nil)
+    }
 }

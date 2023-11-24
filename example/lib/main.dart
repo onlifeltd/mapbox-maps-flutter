@@ -10,6 +10,7 @@ import 'package:mapbox_maps_example/image_source.dart';
 import 'package:mapbox_maps_example/map_interface.dart';
 import 'package:mapbox_maps_example/polygon_annotations.dart';
 import 'package:mapbox_maps_example/polyline_annotations.dart';
+import 'package:mapbox_maps_example/spinning_globe.dart';
 import 'package:mapbox_maps_example/tile_json.dart';
 import 'package:mapbox_maps_example/vector_tile_source.dart';
 
@@ -41,6 +42,7 @@ final List<ExamplePage> _allPages = <ExamplePage>[
   GesturesPage(),
   OrnamentsPage(),
   AnimatedRoutePage(),
+  SpinningGlobePage(),
 ];
 
 class MapsDemo extends StatelessWidget {

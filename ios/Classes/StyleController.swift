@@ -403,20 +403,20 @@ class StyleController: NSObject, FLTStyleManager {
     }
 
     func isStyleLoaded(completion: @escaping (NSNumber?, FlutterError?) -> Void) {
-        completion(NSNumber(value: (mapboxMap.style.isLoaded)), nil)
+        completion(NSNumber(value: (mapboxMap.isLoaded)), nil)
     }
 
     func getProjectionWithCompletion(_ completion: @escaping (String?, FlutterError?) -> Void) {
-        completion(mapboxMap.style.projection.name.rawValue, nil)
+        completion(mapboxMap.projection?.name.rawValue, nil)
     }
 
     func setProjectionProjection(_ projection: String, completion: @escaping (FlutterError?) -> Void) {
-        try! mapboxMap.style.setProjection(projection == "globe" ? StyleProjection(name: StyleProjectionName.globe) : StyleProjection(name: StyleProjectionName.mercator))
+        try! mapboxMap.setProjection(projection == "globe" ? StyleProjection(name: StyleProjectionName.globe) : StyleProjection(name: StyleProjectionName.mercator))
         completion(nil)
     }
 
     func localizeLabelsLocale(_ locale: String, layerIds: [String]?, completion: @escaping (FlutterError?) -> Void) {
-        try! mapboxMap.style.localizeLabels(into: Locale(identifier: locale), forLayerIds: layerIds)
+        try! mapboxMap.localizeLabels(into: Locale(identifier: locale), forLayerIds: layerIds)
         completion(nil)
     }
 

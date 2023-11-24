@@ -85,7 +85,7 @@ class CameraController: NSObject, FLT_CameraManager {
     }
 
     func dragStartPoint(_ point: FLTScreenCoordinate, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        self.mapboxMap.dragStart(for: point.toCGPoint())
+//        self.mapboxMap.dragStart(for: point.toCGPoint())
     }
 
     func getDragCameraOptions(fromPoint: FLTScreenCoordinate, toPoint: FLTScreenCoordinate, error: AutoreleasingUnsafeMutablePointer<FlutterError?>) -> FLTCameraOptions? {
@@ -93,7 +93,7 @@ class CameraController: NSObject, FLT_CameraManager {
     }
 
     func dragEndWithError(_ error: AutoreleasingUnsafeMutablePointer<FlutterError?>) {
-        self.mapboxMap.dragEnd()
+//        self.mapboxMap.dragEnd()
     }
 
     private var mapboxMap: MapboxMap
