@@ -47,8 +47,20 @@ class StyleController: NSObject, FLTStyleManager {
     func addStyleLayerProperties(_ properties: String, layerPosition: FLTLayerPosition?,
                                  completion: @escaping (FlutterError?) -> Void) {
         do {
-            let layerProperties: [String: Any] = convertStringToDictionary(properties: properties)
-            try mapboxMap.style.addLayer(with: layerProperties, layerPosition: layerPosition?.toLayerPosition())
+            var layerProperties: [String: Any] = convertStringToDictionary(properties: properties)
+            
+            if var layer = try? HeatmapLayer(jsonObject: layerProperties), layer.type == LayerType.heatmap {
+                if case let .constant(v) = (layer as HeatmapLayer).heatmapColor {
+                    if let expressionData = v.rawValue.data(using: .utf8) {
+                        if let expression = try? JSONDecoder().decode(Expression.self, from: expressionData) {
+                            layer.heatmapColor = .expression(expression)
+                        }
+                    }
+                }
+                try mapboxMap.addLayer(with: layer.allStyleProperties(), layerPosition: layerPosition?.toLayerPosition())
+            } else {
+                try mapboxMap.addLayer(with: layerProperties, layerPosition: layerPosition?.toLayerPosition())
+            }
             completion(nil)
         } catch {
             completion(FlutterError(code: StyleController.errorCode, message: "\(error)", details: nil))
