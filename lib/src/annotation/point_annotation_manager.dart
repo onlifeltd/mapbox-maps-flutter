@@ -7,6 +7,9 @@ class PointAnnotationManager extends BaseAnnotationManager {
       {required String id, required BinaryMessenger messenger})
       : super(id: id, messenger: messenger);
 
+  /// Needs for handling tap on cluster
+  String get clusterLayerId => 'mapbox-iOS-cluster-circle-layer-manager-$id';
+
   late _PointAnnotationMessager messager =
       _PointAnnotationMessager(binaryMessenger: _messenger);
 

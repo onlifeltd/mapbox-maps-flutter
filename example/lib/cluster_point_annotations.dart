@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
@@ -80,6 +82,44 @@ class ClusterPointAnnotationPageBodyState
     });
   }
 
+  // Callback for handling cluster tap
+  Future<void> onTapListener(ScreenCoordinate coord) async {
+    final ScreenCoordinate conv = await mapboxMap!.pixelForCoordinate(
+      Point(coordinates: Position(coord.y, coord.x)).toJson(),
+    );
+
+    final List<QueriedFeature?> features =
+        await mapboxMap!.queryRenderedFeatures(
+      RenderedQueryGeometry(
+        value: jsonEncode(conv.encode()),
+        type: Type.SCREEN_COORDINATE,
+      ),
+      // add these options if you want to query only specific layer,
+      // for example, your countries layer id
+      RenderedQueryOptions(
+        layerIds: [pointAnnotationManager!.clusterLayerId],
+      ),
+    );
+
+    // do what you need with the features
+    if (features.isNotEmpty) {
+      final result = await mapboxMap!.getGeoJsonClusterExpansionZoom(
+          pointAnnotationManager!.id, features.first!.feature);
+
+      final Map<String, dynamic> normalizedFeature =
+          Map.castFrom(features.first!.feature);
+      final Map<String?, Object?> point =
+          Map.castFrom(normalizedFeature['geometry']);
+
+      mapboxMap!.flyTo(
+          CameraOptions(
+            center: point,
+            zoom: double.parse(result.value!),
+          ),
+          MapAnimationOptions(duration: 1000));
+    }
+  }
+
   void _createOneAnnotation(Uint8List list) {
     pointAnnotationManager
         ?.create(PointAnnotationOptions(
@@ -105,6 +145,7 @@ class ClusterPointAnnotationPageBodyState
         key: ValueKey("mapWidget"),
         resourceOptions: ResourceOptions(accessToken: MapsDemo.ACCESS_TOKEN),
         onMapCreated: _onMapCreated,
+        onTapListener: onTapListener,
       ),
     );
   }
