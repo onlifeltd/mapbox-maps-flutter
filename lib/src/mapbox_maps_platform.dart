@@ -153,6 +153,19 @@ class _MapboxMapsPlatform {
     }
   }
 
+  Future<dynamic> createPointAnnotationManager(
+      ClusterOptions? clusterOptions) async {
+    try {
+      return _channel
+          .invokeMethod('annotation#create_manager', <String, dynamic>{
+        'type': 'point',
+        if (clusterOptions != null) 'clusterOptions': clusterOptions.toMap(),
+      });
+    } on PlatformException catch (e) {
+      return new Future.error(e);
+    }
+  }
+
   Future<dynamic> createAnnotationManager(String type) async {
     try {
       return _channel.invokeMethod(
@@ -187,10 +200,11 @@ class _MapboxMapsPlatform {
     }
   }
 
-  Future<dynamic> setStyleImportConfigProperty(String config, dynamic value) async {
+  Future<dynamic> setStyleImportConfigProperty(
+      String config, dynamic value) async {
     try {
-      return _channel.invokeMethod(
-          'setStyleImportConfigProperty', <String, dynamic>{'config': config, 'value': value});
+      return _channel.invokeMethod('setStyleImportConfigProperty',
+          <String, dynamic>{'config': config, 'value': value});
     } on PlatformException catch (e) {
       return new Future.error(e);
     }
