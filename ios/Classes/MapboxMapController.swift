@@ -153,8 +153,9 @@ class MapboxMapController: NSObject, FlutterPlatformView {
     func onMethodCall(methodCall: FlutterMethodCall, result: @escaping FlutterResult) {
         switch methodCall.method {
         case "map#subscribe":
-//            guard let arguments = methodCall.arguments as? [String: Any] else { return }
-//            guard let eventType = arguments["event"] as? String else { return }
+            guard let arguments = methodCall.arguments as? [String: Any] else { return }
+            guard let eventType = arguments["event"] as? String else { return }
+            subscribeEvent(eventType: eventType)
 //            mapboxMap.onEvery(MapEvents.EventKind(rawValue: eventType)!) { (event) in
 //                guard let data = event.data as? [String: Any] else {return}
 //                self.channel.invokeMethod(self.getEventMethodName(eventType: eventType),
@@ -190,15 +191,24 @@ class MapboxMapController: NSObject, FlutterPlatformView {
         }
         
         switch eventType {
-        case "render-frame-started":
-            mapboxMap.onRenderFrameStarted.observe { event in
-                invokeMethod(["begin": Int(event.timestamp.timeIntervalSince1970), "end": 0])
-            }.store(in: &cancelables);
-        case "style-loaded":
-            mapboxMap.onStyleLoaded.observe { event in
-                invokeMethod(["begin": Int(event.timeInterval.begin.timeIntervalSince1970), "end": Int(event.timeInterval.end.timeIntervalSince1970)])
-            }.store(in: &cancelables);
-        default: break
+            case "location-change":
+                mapView.location.onLocationChange.observe
+                    { newLocation in
+                        invokeMethod(["latitude": newLocation.last?.coordinate.latitude ?? 0, "longitude": newLocation.last?.coordinate.longitude ?? 0])
+                    }.store(in: &cancelables)
+            case "camera-changed":
+                mapboxMap.onCameraChanged.observe { event in
+                    invokeMethod(["begin": Int(event.timestamp.timeIntervalSince1970), "end": 0])
+                }.store(in: &cancelables)
+            case "render-frame-started":
+                mapboxMap.onRenderFrameStarted.observe { event in
+                    invokeMethod(["begin": Int(event.timestamp.timeIntervalSince1970), "end": 0])
+                }.store(in: &cancelables);
+            case "style-loaded":
+                mapboxMap.onStyleLoaded.observe { event in
+                    invokeMethod(["begin": Int(event.timeInterval.begin.timeIntervalSince1970), "end": Int(event.timeInterval.end.timeIntervalSince1970)])
+                }.store(in: &cancelables);
+            default: break
         }
         
     }

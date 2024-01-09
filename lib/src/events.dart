@@ -253,6 +253,9 @@ class MapEvents {
   /// └── cancelled - Boolean
   /// ```
   static const String RESOURCE_REQUEST = "resource-request";
+
+  // TODO(amarchenko): add description here
+  static const String LOCATION_CHANGE = "location-change";
 }
 
 /// The class for camera-changed event in Observer
@@ -267,6 +270,26 @@ class CameraChangedEventData {
   CameraChangedEventData.fromJson(Map<String, dynamic> json)
       : begin = json['begin'],
         end = json['end'];
+}
+
+/// The class for camera-changed event in Observer
+// TODO(amarchenko): document method
+class LocationChangeEventData {
+  /// Representing timestamp taken at the time of an event creation; in microseconds; since the epoch.
+  final double latitude;
+
+  /// For an interfinal events; an optional `end` property will be present that represents timestamp taken at the time
+
+  final double longitude;
+
+  LocationChangeEventData.fromJson(Map<String, dynamic> json)
+      : latitude = json['latitude'],
+        longitude = json['longitude'];
+
+  @override
+  String toString() {
+    return '[$runtimeType]: latitude = $latitude, longitude = $longitude';
+  }
 }
 
 /// The class for map-idle event in Observer
