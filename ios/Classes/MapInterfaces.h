@@ -605,13 +605,15 @@ typedef NS_ENUM(NSUInteger, FLT_MapEvent) {
 
 @interface FLTMapAnimationOptions : NSObject
 + (instancetype)makeWithDuration:(nullable NSNumber *)duration
-    startDelay:(nullable NSNumber *)startDelay;
+    startDelay:(nullable NSNumber *)startDelay curve:(nullable NSNumber *)curve;
 /// The duration of the animation in milliseconds.
 /// If not set explicitly default duration will be taken 300ms
 @property(nonatomic, strong, nullable) NSNumber * duration;
 /// The amount of time, in milliseconds, to delay starting the animation after animation start.
 /// If not set explicitly default startDelay will be taken 0ms. This only works for Android.
 @property(nonatomic, strong, nullable) NSNumber * startDelay;
+/// curve value 0 - easeInOut, 1 - easeIn, 2 - easeOut, 3 - linear
+@property(nonatomic, strong, nullable) NSNumber * curve;
 @end
 
 /// A rectangular area as measured on a two-dimensional map projection.

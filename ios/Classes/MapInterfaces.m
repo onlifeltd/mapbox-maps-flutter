@@ -713,16 +713,18 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
 
 @implementation FLTMapAnimationOptions
 + (instancetype)makeWithDuration:(nullable NSNumber *)duration
-    startDelay:(nullable NSNumber *)startDelay {
+    startDelay:(nullable NSNumber *)startDelay curve:(nullable NSNumber *)curve {
   FLTMapAnimationOptions* pigeonResult = [[FLTMapAnimationOptions alloc] init];
   pigeonResult.duration = duration;
   pigeonResult.startDelay = startDelay;
+  pigeonResult.curve = curve;
   return pigeonResult;
 }
 + (FLTMapAnimationOptions *)fromList:(NSArray *)list {
   FLTMapAnimationOptions *pigeonResult = [[FLTMapAnimationOptions alloc] init];
   pigeonResult.duration = GetNullableObjectAtIndex(list, 0);
   pigeonResult.startDelay = GetNullableObjectAtIndex(list, 1);
+  pigeonResult.curve = GetNullableObjectAtIndex(list, 2);
   return pigeonResult;
 }
 + (nullable FLTMapAnimationOptions *)nullableFromList:(NSArray *)list {
@@ -732,6 +734,7 @@ static id GetNullableObjectAtIndex(NSArray *array, NSInteger key) {
   return @[
     (self.duration ?: [NSNull null]),
     (self.startDelay ?: [NSNull null]),
+    (self.curve ?: [NSNull null]),
   ];
 }
 @end
