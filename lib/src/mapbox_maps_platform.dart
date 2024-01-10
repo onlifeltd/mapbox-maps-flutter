@@ -184,6 +184,15 @@ class _MapboxMapsPlatform {
       return new Future.error(e);
     }
   }
+
+  Future<dynamic> setStyleImportConfigProperty(String config, dynamic value) async {
+    try {
+      return _channel.invokeMethod(
+          'setStyleImportConfigProperty', <String, dynamic>{'config': config, 'value': value});
+    } on PlatformException catch (e) {
+      return new Future.error(e);
+    }
+  }
 }
 
 /// A registry to hold suffixes for Channels.

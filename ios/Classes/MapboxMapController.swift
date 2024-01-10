@@ -186,9 +186,20 @@ class MapboxMapController: NSObject, FlutterPlatformView {
         case "gesture#remove_listeners":
             gesturesController!.removeListeners()
             result(nil)
+        case "setStyleImportConfigProperty":
+            setStyleImportConfigProperty(methodCall: methodCall)
+            result(nil)
         default:
             result(FlutterMethodNotImplemented)
         }
+    }
+    
+    private func setStyleImportConfigProperty(methodCall: FlutterMethodCall) {
+        guard let arguments = methodCall.arguments as? [String: Any] else { return }
+        guard let config = arguments["config"] as? String else { return }
+        guard let value = arguments["value"] else { return }
+        
+        try? self.mapView.mapboxMap.setStyleImportConfigProperty(for: "basemap", config: config, value: value)
     }
 
     final class HttpUseragentInterceptor: HttpServiceInterceptorInterface {

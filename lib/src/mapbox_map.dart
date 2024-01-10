@@ -580,6 +580,10 @@ class MapboxMap extends ChangeNotifier {
     this.onMapScrollListener = onMapScrollListener;
     _setupGestures();
   }
+
+  Future<dynamic> setStyleImportConfigProperty(String config, dynamic value) async {
+    return _mapboxMapsPlatform.setStyleImportConfigProperty(config, value);
+  }
 }
 
 class _GestureListener extends GestureListener {
