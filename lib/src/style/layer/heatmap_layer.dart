@@ -33,7 +33,7 @@ class HeatmapLayer extends Layer {
   String? sourceLayer;
 
   /// Defines the color of each pixel based on its density value in a heatmap. Should be an expression that uses `["heatmap-density"]` as input.
-  int? heatmapColor;
+  String? heatmapColor;
 
   /// Similar to `heatmap-weight` but controls the intensity of the heatmap globally. Primarily used for adjusting the heatmap based on zoom level.
   double? heatmapIntensity;
@@ -56,7 +56,7 @@ class HeatmapLayer extends Layer {
     }
     var paint = {};
     if (heatmapColor != null) {
-      paint["heatmap-color"] = heatmapColor?.toRGBA();
+      paint["heatmap-color"] = heatmapColor;
     }
     if (heatmapIntensity != null) {
       paint["heatmap-intensity"] = heatmapIntensity;
@@ -116,7 +116,7 @@ class HeatmapLayer extends Layer {
               .last
               .toLowerCase()
               .contains(map["layout"]["visibility"])),
-      heatmapColor: (map["paint"]["heatmap-color"] as List?)?.toRGBAInt(),
+      heatmapColor: (map["paint"]["heatmap-color"] as String?),
       heatmapIntensity: map["paint"]["heatmap-intensity"] is num?
           ? (map["paint"]["heatmap-intensity"] as num?)?.toDouble()
           : null,
