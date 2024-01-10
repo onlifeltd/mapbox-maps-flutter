@@ -4,7 +4,6 @@ import 'package:mapbox_maps_example/animation.dart';
 import 'package:mapbox_maps_example/camera.dart';
 import 'package:mapbox_maps_example/circle_annotations.dart';
 import 'package:mapbox_maps_example/cluster.dart';
-import 'package:mapbox_maps_example/cluster_point_annotations.dart';
 import 'package:mapbox_maps_example/ornaments.dart';
 import 'package:mapbox_maps_example/geojson_line.dart';
 import 'package:mapbox_maps_example/image_source.dart';
@@ -54,8 +53,7 @@ class MapsDemo extends StatelessWidget {
   //
   // Alternatively you can replace `String.fromEnvironment("ACCESS_TOKEN")`
   // in the following line with your access token directly.
-  static const String ACCESS_TOKEN =
-      'sk.eyJ1IjoiYWdsZXQtZGV2b3BzIiwiYSI6ImNsaW1qYTRyNTBjeHUzbHRoMmtqNHZtbnkifQ.6mrvz1K7R8qrFfrPI4ICTA';
+  static const String ACCESS_TOKEN = String.fromEnvironment("ACCESS_TOKEN");
 
   void _pushPage(BuildContext context, ExamplePage page) async {
     Navigator.of(context).push(MaterialPageRoute<void>(
