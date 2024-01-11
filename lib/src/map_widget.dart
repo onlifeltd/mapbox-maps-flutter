@@ -54,6 +54,7 @@ class MapWidget extends StatefulWidget {
     this.onMapCreated,
     this.onStyleLoadedListener,
     this.onCameraChangeListener,
+    this.onLocationChangeListener,
     this.onMapIdleListener,
     this.onMapLoadedListener,
     this.onMapLoadErrorListener,
@@ -99,6 +100,9 @@ class MapWidget extends StatefulWidget {
 
   /// Invoked whenever camera position changes.
   final OnCameraChangeListener? onCameraChangeListener;
+
+  /// Invoked whenever location changes.
+  final OnLocationChangeListener? onLocationChangeListener;
 
   /// Invoked when the Map has entered the idle state. The Map is in the idle state when there are no ongoing transitions
   /// and the Map has rendered all available tiles.
@@ -223,6 +227,7 @@ class _MapWidgetState extends State<MapWidget> {
     _events.updateSubscriptions(
         onStyleLoadedListener: widget.onStyleLoadedListener,
         onCameraChangeListener: widget.onCameraChangeListener,
+        onLocationChangeListener: widget.onLocationChangeListener,
         onMapIdleListener: widget.onMapIdleListener,
         onMapLoadedListener: widget.onMapLoadedListener,
         onMapLoadErrorListener: widget.onMapLoadErrorListener,

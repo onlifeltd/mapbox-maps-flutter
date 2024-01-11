@@ -386,6 +386,7 @@ enum _MapEvent {
   renderFrameStarted,
   renderFrameFinished,
   resourceRequest,
+  locationChange,
 }
 
 /// Various options needed for tile cover.

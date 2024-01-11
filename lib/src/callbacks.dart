@@ -10,6 +10,9 @@ typedef void OnStyleLoadedListener(StyleLoadedEventData styleLoadedEventData);
 typedef void OnCameraChangeListener(
     CameraChangedEventData cameraChangedEventData);
 
+/// Definition for listener invoked whenever the location position changes.
+typedef void OnLocationChangeListener(LocationChangeEventData eventData);
+
 /// Definition for listener invoked whenever the Map has entered the idle state.
 typedef void OnMapIdleListener(MapIdleEventData mapIdleEventData);
 

@@ -458,7 +458,8 @@ class MapboxMap extends ChangeNotifier {
   /// The snapshot is taken from the current state of the map.
   Future<Uint8List> snapshot() => _mapboxMapsPlatform.snapshot();
 
-  Future<dynamic> setStyleImportConfigProperty(String config, dynamic value) async {
+  Future<dynamic> setStyleImportConfigProperty(
+      String config, dynamic value) async {
     return _mapboxMapsPlatform.setStyleImportConfigProperty(config, value);
   }
 }
