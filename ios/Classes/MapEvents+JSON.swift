@@ -205,6 +205,15 @@ extension MapEventEncodable {
     }
 }
 
+extension CLLocationCoordinate2D: MapEventEncodable {
+    var toJSON: [String: Any?] {
+        [
+            "latitude": latitude,
+            "longitude": longitude,
+        ]
+    }
+}
+
 // MARK: Date
 
 private extension Date {

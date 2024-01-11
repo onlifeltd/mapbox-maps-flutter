@@ -6,6 +6,7 @@ class MapboxMap extends ChangeNotifier {
     required _MapboxMapsPlatform mapboxMapsPlatform,
     this.onStyleLoadedListener,
     this.onCameraChangeListener,
+    this.onLocationChangeListener,
     this.onMapIdleListener,
     this.onMapLoadedListener,
     this.onMapLoadErrorListener,
@@ -32,6 +33,11 @@ class MapboxMap extends ChangeNotifier {
     if (onCameraChangeListener != null) {
       _mapboxMapsPlatform.onCameraChangeListenerPlatform.add((argument) {
         onCameraChangeListener?.call(argument);
+      });
+    }
+    if (onLocationChangeListener != null) {
+      _mapboxMapsPlatform.onLocationChangeListenerPlatform.add((argument) {
+        onLocationChangeListener?.call(argument);
       });
     }
     if (onMapIdleListener != null) {
@@ -99,6 +105,9 @@ class MapboxMap extends ChangeNotifier {
 
   /// Invoked whenever camera position changes.
   final OnCameraChangeListener? onCameraChangeListener;
+
+  /// Invoked whenever location changes.
+  final OnLocationChangeListener? onLocationChangeListener;
 
   /// Invoked when the Map has entered the idle state. The Map is in the idle state when there are no ongoing transitions
   /// and the Map has rendered all available tiles.

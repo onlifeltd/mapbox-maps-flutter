@@ -443,6 +443,7 @@ typedef NS_ENUM(NSUInteger, FLT_MapEvent) {
   FLT_MapEventRenderFrameStarted = 11,
   FLT_MapEventRenderFrameFinished = 12,
   FLT_MapEventResourceRequest = 13,
+  FLT_MapEventLocationChange = 14,
 };
 
 /// Wrapper for FLT_MapEvent to allow for nullability.
