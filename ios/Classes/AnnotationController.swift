@@ -62,6 +62,60 @@ class AnnotationController: ControllerDelegate {
         polylineAnnotationController = PolylineAnnotationController(withDelegate: self)
     }
 
+    func createClusterOptions(options: [String: Any]?) -> ClusterOptions? {
+        if (options == nil) {
+            return nil;
+        }
+
+        var circleRadius: Value<Double> = .constant(18)
+        var circleColor: Value<StyleColor> = .constant(StyleColor(.black))
+        var textColor: Value<StyleColor> = .constant(StyleColor(.white))
+        var textSize: Value<Double> = .constant(12)
+        var textField: Value<String> = .expression(Exp(.get) { "point_count" })
+        let clusterRadius: Double = options!["clusterRadius"] as? Double ?? 50
+        let clusterMaxZoom: Double = options!["clusterMaxZoom"] as? Double ?? 14
+
+        if let circleRadiusExpressionFromArgs = (options!["circleRadiusExpression"] as? String?) {
+            if (circleRadiusExpressionFromArgs?.utf8 != nil) {
+                let decodedExpression = try! JSONDecoder().decode(Expression.self, from: Data( circleRadiusExpressionFromArgs!.utf8))
+                circleRadius = .expression(decodedExpression)
+            }
+        }
+        if let circleColorExpressionFromArgs = (options!["circleColorExpression"] as? String?) {
+            if (circleColorExpressionFromArgs?.utf8 != nil) {
+                let decodedExpression = try! JSONDecoder().decode(Expression.self, from: Data( circleColorExpressionFromArgs!.utf8))
+                circleColor = .expression(decodedExpression)
+            }
+        }
+        if let textColorExpressionFromArgs = (options!["textColorExpression"] as? String?) {
+            if (textColorExpressionFromArgs?.utf8 != nil) {
+                let decodedExpression = try! JSONDecoder().decode(Expression.self, from: Data( textColorExpressionFromArgs!.utf8))
+                textColor = .expression(decodedExpression)
+            }
+        }
+        if let textSizeExpressionFromArgs = (options!["textSizeExpression"] as? String?) {
+            if (textSizeExpressionFromArgs?.utf8 != nil) {
+                let decodedExpression = try! JSONDecoder().decode(Expression.self, from: Data( textSizeExpressionFromArgs!.utf8))
+                textSize = .expression(decodedExpression)
+            }
+        }
+        if let textFieldExpressionFromArgs = (options!["textFieldExpression"] as? String?) {
+            if (textFieldExpressionFromArgs?.utf8 != nil) {
+                let decodedExpression = try! JSONDecoder().decode(Expression.self, from: Data( textFieldExpressionFromArgs!.utf8))
+                textField = .expression(decodedExpression)
+            }
+        }
+
+        // Select the options for clustering and pass them to the PointAnnotationManager to display
+        return ClusterOptions(circleRadius: circleRadius,
+                              circleColor: circleColor,
+                              textColor: textColor,
+                              textSize: textSize,
+                              textField: textField,
+                              clusterRadius: clusterRadius,
+                              clusterMaxZoom: clusterMaxZoom)
+    }
+
     func handleCreateManager(methodCall: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let arguments = methodCall.arguments as? [String: Any] else { return }
         guard let type = arguments["type"] as? String else { return }
@@ -85,7 +139,8 @@ class AnnotationController: ControllerDelegate {
             case "point":
                 let pointManager = mapView.annotations.makePointAnnotationManager(
                     id: id,
-                    layerPosition: belowLayerId.map(MapboxMaps.LayerPosition.below)
+                    layerPosition: belowLayerId.map(MapboxMaps.LayerPosition.below),
+                    clusterOptions: createClusterOptions(options: arguments["clusterOptions"] as? [String: Any])
                 )
                 pointManager.delegate = self
                 return pointManager
