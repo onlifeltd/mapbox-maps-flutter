@@ -7,9 +7,11 @@ class _AnnotationManager {
       : _mapboxMapsPlatform = mapboxMapsPlatform;
 
   /// Create a PointAnnotationManager to add/remove/update PointAnnotations on the map.
-  Future<PointAnnotationManager> createPointAnnotationManager() async {
-    return _mapboxMapsPlatform.createAnnotationManager('point').then((value) =>
-        PointAnnotationManager(
+  Future<PointAnnotationManager> createPointAnnotationManager(
+      [ClusterOptions? clusterOptions]) async {
+    return _mapboxMapsPlatform
+        .createPointAnnotationManager(clusterOptions)
+        .then((value) => PointAnnotationManager(
             id: value, messenger: _mapboxMapsPlatform.binaryMessenger));
   }
 

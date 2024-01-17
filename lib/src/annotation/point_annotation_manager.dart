@@ -10,6 +10,9 @@ class PointAnnotationManager extends BaseAnnotationManager {
   late _PointAnnotationMessager messager =
       _PointAnnotationMessager(binaryMessenger: _messenger);
 
+  /// Needs for handling tap on cluster
+  String get clusterLayerId => 'mapbox-iOS-cluster-circle-layer-manager-$id';
+
   /// Add a listener to receive the callback when an annotation is clicked.
   void addOnPointAnnotationClickListener(
       OnPointAnnotationClickListener listener) {
