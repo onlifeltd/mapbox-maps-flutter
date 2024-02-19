@@ -46,6 +46,9 @@ class _GestureListenerCodec extends StandardMessageCodec {
     } else if (value is ScreenCoordinate) {
       buffer.putUint8(130);
       writeValue(buffer, value.encode());
+    } else if (value is GestureScreenCoordinate) {
+      buffer.putUint8(131);
+      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -60,6 +63,8 @@ class _GestureListenerCodec extends StandardMessageCodec {
         return Point.decode(readValue(buffer)!);
       case 130:
         return ScreenCoordinate.decode(readValue(buffer)!);
+      case 131:
+        return GestureScreenCoordinate.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -75,6 +80,12 @@ abstract class GestureListener {
   void onLongTap(MapContentGestureContext context);
 
   void onScroll(MapContentGestureContext context);
+
+  void onDidBegin(GestureScreenCoordinate coordinate);
+
+  void onDidEnd(GestureScreenCoordinate coordinate);
+
+  void onDidEndWithAnimating(GestureScreenCoordinate coordinate);
 
   static void setUp(
     GestureListener? api, {
@@ -170,5 +181,47 @@ abstract class GestureListener {
         });
       }
     }
+
+    final setupGestureListener = (String name, OnGestureListener callback) {
+      final BasicMessageChannel<Object?> __pigeon_channel =
+          BasicMessageChannel<Object?>(
+              'dev.flutter.pigeon.mapbox_maps_flutter.GestureListener.$name',
+              pigeonChannelCodec,
+              binaryMessenger: binaryMessenger);
+      if (api == null) {
+        __pigeon_channel.setMessageHandler(null);
+      } else {
+        __pigeon_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+              'Argument for dev.flutter.pigeon.mapbox_maps_flutter.GestureListener.$name was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final GestureScreenCoordinate? arg_coordinate =
+              (args[0] as GestureScreenCoordinate?);
+
+          assert(arg_coordinate != null,
+              'Argument for dev.flutter.pigeon.mapbox_maps_flutter.GestureListener.$name was null, expected non-null ScreenCoordinate.');
+
+          try {
+            callback(arg_coordinate!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          } catch (e) {
+            return wrapResponse(
+                error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    };
+
+    setupGestureListener('onGestureDidBegin', (arg_coordinate) {
+      api?.onDidBegin(arg_coordinate);
+    });
+    setupGestureListener('onGestureDidEnd', (arg_coordinate) {
+      api?.onDidEnd(arg_coordinate);
+    });
+    setupGestureListener('onGestureDidEndAnimating', (arg_coordinate) {
+      api?.onDidEndWithAnimating(arg_coordinate);
+    });
   }
 }

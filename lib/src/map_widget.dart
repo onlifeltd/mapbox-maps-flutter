@@ -70,6 +70,9 @@ class MapWidget extends StatefulWidget {
     this.onTapListener,
     this.onLongTapListener,
     this.onScrollListener,
+    this.onGestureDidBeginListener,
+    this.onGestureDidEndListener,
+    this.onGestureDidEndWithAnimatingListener,
   }) : super(key: key) {}
 
   /// Describes the map options value when using a MapWidget.
@@ -162,6 +165,9 @@ class MapWidget extends StatefulWidget {
   final OnMapTapListener? onTapListener;
   final OnMapLongTapListener? onLongTapListener;
   final OnMapScrollListener? onScrollListener;
+  final OnGestureListener? onGestureDidBeginListener;
+  final OnGestureListener? onGestureDidEndListener;
+  final OnGestureListener? onGestureDidEndWithAnimatingListener;
 
   @override
   State createState() {
@@ -248,6 +254,10 @@ class _MapWidgetState extends State<MapWidget> {
       onMapTapListener: widget.onTapListener,
       onMapLongTapListener: widget.onLongTapListener,
       onMapScrollListener: widget.onScrollListener,
+      onGestureDidBeginListener: widget.onGestureDidBeginListener,
+      onGestureDidEndListener: widget.onGestureDidEndListener,
+      onGestureDidEndWithAnimatingListener:
+          widget.onGestureDidEndWithAnimatingListener,
     );
     _controller.complete(controller);
     if (widget.onMapCreated != null) {

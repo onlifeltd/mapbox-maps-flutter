@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:mapbox_maps_example/utils.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 import 'page.dart';
 
@@ -78,7 +78,19 @@ class PointAnnotationPageBodyState extends State<PointAnnotationPageBody> {
             iconOffset: [0.0, -5.0],
             symbolSortKey: 10,
             image: list))
-        .then((value) => pointAnnotation = value);
+        .then((value) {
+      mapboxMap?.flyTo(
+          CameraOptions(
+            center: Point(coordinates: Position(0.381457, 6.687337)).toJson(),
+            zoom: 3.0,
+          ),
+          null);
+      // keep the same image
+      pointAnnotation!.image = null;
+      pointAnnotation!.iconImage = null;
+
+      return pointAnnotation = value;
+    });
   }
 
   @override

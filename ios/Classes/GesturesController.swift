@@ -6,9 +6,16 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
 
     private var onGestureListener: GestureListener?
 
-    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didBegin gestureType: MapboxMaps.GestureType) {}
+    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didBegin gestureType: MapboxMaps.GestureType) {
+        let point = Point(mapView.mapboxMap.coordinate(for: gestureManager.singleTapGestureRecognizer.location(in: mapView)))
+
+        self.onGestureListener?.onGestureDidBegin(FLT_GESTURESScreenCoordinate.make(withType: gestureType.index, x: point.coordinates.latitude, y: point.coordinates.longitude, willAnimate: false), completion: {_ in })
+    }
 
     func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didEnd gestureType: MapboxMaps.GestureType, willAnimate: Bool) {
+        let point = Point(mapView.mapboxMap.coordinate(for: gestureManager.singleTapGestureRecognizer.location(in: mapView)))
+        self.onGestureListener?.onGestureDidEnd(FLT_GESTURESScreenCoordinate.make(withType: gestureType.index, x: point.coordinates.latitude, y: point.coordinates.longitude, willAnimate: false), completion: {_ in })
+
         guard gestureType == .singleTap else {
             return
         }
@@ -20,7 +27,11 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
         onGestureListener?.onTap(context: context, completion: { _ in })
     }
 
-    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didEndAnimatingFor gestureType: MapboxMaps.GestureType) {}
+    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didEndAnimatingFor gestureType: MapboxMaps.GestureType) {
+        let point = Point(mapView.mapboxMap.coordinate(for: gestureManager.singleTapGestureRecognizer.location(in: mapView)))
+
+        self.onGestureListener?.onGestureDidEndAnimating(FLT_GESTURESScreenCoordinate.make(withType: gestureType.index, x: point.coordinates.latitude, y: point.coordinates.longitude, willAnimate: false), completion: {_ in })
+    }
 
     @objc private func onMapPan(_ sender: UIPanGestureRecognizer) {
         guard sender.state == .began || sender.state == .changed || sender.state == .ended else {
@@ -142,5 +153,12 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
 
     init(withMapView mapView: MapView) {
         self.mapView = mapView
+    }
+}
+
+
+extension MapboxMaps.GestureType {
+    var index: Int32 {
+        return Int32(MapboxMaps.GestureType.allCases.firstIndex(of: self) ?? 0)
     }
 }

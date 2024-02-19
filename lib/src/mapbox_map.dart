@@ -7,6 +7,9 @@ class MapboxMap extends ChangeNotifier {
     this.onMapTapListener,
     this.onMapLongTapListener,
     this.onMapScrollListener,
+    this.onGestureDidBeginListener,
+    this.onGestureDidEndListener,
+    this.onGestureDidEndWithAnimatingListener,
   }) : _mapboxMapsPlatform = mapboxMapsPlatform {
     _proxyBinaryMessenger = _mapboxMapsPlatform.binaryMessenger;
 
@@ -65,6 +68,9 @@ class MapboxMap extends ChangeNotifier {
   OnMapTapListener? onMapTapListener;
   OnMapLongTapListener? onMapLongTapListener;
   OnMapScrollListener? onMapScrollListener;
+  OnGestureListener? onGestureDidBeginListener;
+  OnGestureListener? onGestureDidEndListener;
+  OnGestureListener? onGestureDidEndWithAnimatingListener;
 
   @override
   void dispose() {
@@ -427,12 +433,19 @@ class MapboxMap extends ChangeNotifier {
   void _setupGestures() {
     if (onMapTapListener != null ||
         onMapLongTapListener != null ||
-        onMapScrollListener != null) {
+        onMapScrollListener != null ||
+        onGestureDidBeginListener != null ||
+        onGestureDidEndListener != null ||
+        onGestureDidEndWithAnimatingListener != null) {
       GestureListener.setUp(
           _GestureListener(
             onMapTapListener: onMapTapListener,
             onMapLongTapListener: onMapLongTapListener,
             onMapScrollListener: onMapScrollListener,
+            onMapGestureDidBeginListener: onGestureDidBeginListener,
+            onMapGestureDidEndListener: onGestureDidEndListener,
+            onMapGestureDidEndWithAnimatingListener:
+                onGestureDidEndWithAnimatingListener,
           ),
           binaryMessenger: _mapboxMapsPlatform.binaryMessenger);
       _mapboxMapsPlatform.addGestureListeners();
@@ -469,11 +482,17 @@ class _GestureListener extends GestureListener {
     this.onMapTapListener,
     this.onMapLongTapListener,
     this.onMapScrollListener,
+    this.onMapGestureDidBeginListener,
+    this.onMapGestureDidEndListener,
+    this.onMapGestureDidEndWithAnimatingListener,
   });
 
   final OnMapTapListener? onMapTapListener;
   final OnMapLongTapListener? onMapLongTapListener;
   final OnMapScrollListener? onMapScrollListener;
+  final OnGestureListener? onMapGestureDidBeginListener;
+  final OnGestureListener? onMapGestureDidEndListener;
+  final OnGestureListener? onMapGestureDidEndWithAnimatingListener;
 
   @override
   void onTap(MapContentGestureContext context) {
@@ -488,5 +507,20 @@ class _GestureListener extends GestureListener {
   @override
   void onScroll(MapContentGestureContext context) {
     onMapScrollListener?.call(context);
+  }
+
+  @override
+  void onDidBegin(GestureScreenCoordinate coordinate) {
+    onMapGestureDidBeginListener?.call(coordinate);
+  }
+
+  @override
+  void onDidEnd(GestureScreenCoordinate coordinate) {
+    onMapGestureDidEndListener?.call(coordinate);
+  }
+
+  @override
+  void onDidEndWithAnimating(GestureScreenCoordinate coordinate) {
+    onMapGestureDidEndWithAnimatingListener?.call(coordinate);
   }
 }

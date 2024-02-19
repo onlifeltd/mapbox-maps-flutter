@@ -65,3 +65,5 @@ typedef void OnMapLongTapListener(MapContentGestureContext context);
 
 /// Gesture listener called on map scroll.
 typedef void OnMapScrollListener(MapContentGestureContext context);
+
+typedef void OnGestureListener(GestureScreenCoordinate coordinate);

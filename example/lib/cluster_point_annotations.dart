@@ -9,7 +9,7 @@ import 'page.dart';
 
 class ClusterPointAnnotationsPage extends ExamplePage {
   ClusterPointAnnotationsPage()
-      : super(const Icon(Icons.map), 'Point Annotations');
+      : super(const Icon(Icons.map), 'Cluster Annotations');
 
   @override
   Widget build(BuildContext context) {

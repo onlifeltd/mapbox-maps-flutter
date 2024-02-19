@@ -979,6 +979,38 @@ class ScreenCoordinate {
   }
 }
 
+
+class GestureScreenCoordinate extends ScreenCoordinate {
+  GestureScreenCoordinate({
+    required double x,
+    required double y,
+    required this.type,
+    required this.willAnimate,
+  }): super(x: x, y: y);
+
+  int type;
+  bool willAnimate;
+
+  Object encode() {
+    return <Object?>[
+      x,
+      y,
+      type,
+      willAnimate,
+    ];
+  }
+
+  static GestureScreenCoordinate decode(Object result) {
+    result as List<Object?>;
+    return GestureScreenCoordinate(
+      x: result[0]! as double,
+      y: result[1]! as double,
+      type: result[2]! as int,
+      willAnimate: result[3]! as bool,
+    );
+  }
+}
+
 /// Describes the coordinate box on the screen, measured in `logical pixels`
 /// from top to bottom and from left to right.
 class ScreenBox {
