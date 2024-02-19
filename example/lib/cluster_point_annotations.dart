@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:mapbox_maps_example/utils.dart';
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 import 'page.dart';
 
@@ -44,7 +44,7 @@ class ClusterPointAnnotationPageBodyState
     this.mapboxMap = mapboxMap;
     mapboxMap.annotations
         .createPointAnnotationManager(
-      ClusterOptions(
+      clusterOptions: ClusterOptions(
         circleRadiusExpression:
             '["step",["get", "point_count"],25,50,50,100,70]',
         circleColorExpression:
