@@ -7,11 +7,16 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
     private var onGestureListener: GestureListener?
 
     func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didBegin gestureType: MapboxMaps.GestureType) {
-        let touchPoint = gestureManager.singleTapGestureRecognizer.location(in: mapView)
-        let point = Point(mapView.mapboxMap.coordinate(for: touchPoint))
-        let context = MapContentGestureContext(touchPosition: touchPoint.toFLTScreenCoordinate(), point: point)
+      let touchPoint = gestureManager.singleTapGestureRecognizer.location(in: mapView)
+      let point = Point(mapView.mapboxMap.coordinate(for: touchPoint))
+      let context = MapContentGestureContext(touchPosition: touchPoint.toFLTScreenCoordinate(), point: point)
 
-        onGestureListener?.onGestureDidBegin(context: context, completion: { _ in })
+      onGestureListener?.onGestureDidBegin(context: context, completion: { _ in })
+    
+      guard gestureType == .singleTap else {
+          return
+      }
+      onGestureListener?.onTap(context: context, completion: { _ in })
     }
 
     func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didEnd gestureType: MapboxMaps.GestureType, willAnimate: Bool) {
