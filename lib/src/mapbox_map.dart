@@ -510,17 +510,17 @@ class _GestureListener extends GestureListener {
   }
 
   @override
-  void onDidBegin(GestureScreenCoordinate coordinate) {
-    onMapGestureDidBeginListener?.call(coordinate);
+  void onDidBegin(MapContentGestureContext context) {
+    onMapGestureDidBeginListener?.call(context);
   }
 
   @override
-  void onDidEnd(GestureScreenCoordinate coordinate) {
-    onMapGestureDidEndListener?.call(coordinate);
+  void onDidEnd(MapContentGestureContext context) {
+    onMapGestureDidEndListener?.call(context);
   }
 
   @override
-  void onDidEndWithAnimating(GestureScreenCoordinate coordinate) {
-    onMapGestureDidEndWithAnimatingListener?.call(coordinate);
+  void onDidEndWithAnimating(MapContentGestureContext context) {
+    onMapGestureDidEndWithAnimatingListener?.call(context);
   }
 }

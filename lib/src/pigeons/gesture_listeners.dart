@@ -81,11 +81,11 @@ abstract class GestureListener {
 
   void onScroll(MapContentGestureContext context);
 
-  void onDidBegin(GestureScreenCoordinate coordinate);
+  void onDidBegin(MapContentGestureContext context);
 
-  void onDidEnd(GestureScreenCoordinate coordinate);
+  void onDidEnd(MapContentGestureContext context);
 
-  void onDidEndWithAnimating(GestureScreenCoordinate coordinate);
+  void onDidEndWithAnimating(MapContentGestureContext context);
 
   static void setUp(
     GestureListener? api, {
@@ -185,7 +185,7 @@ abstract class GestureListener {
     final setupGestureListener = (String name, OnGestureListener callback) {
       final BasicMessageChannel<Object?> __pigeon_channel =
           BasicMessageChannel<Object?>(
-              'dev.flutter.pigeon.mapbox_maps_flutter.GestureListener.$name',
+              'dev.flutter.pigeon.mapbox_maps_flutter.GestureListener.$name$messageChannelSuffix',
               pigeonChannelCodec,
               binaryMessenger: binaryMessenger);
       if (api == null) {
@@ -193,13 +193,13 @@ abstract class GestureListener {
       } else {
         __pigeon_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-              'Argument for dev.flutter.pigeon.mapbox_maps_flutter.GestureListener.$name was null.');
+              'Argument for dev.flutter.pigeon.mapbox_maps_flutter.GestureListener.$name$messageChannelSuffix was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final GestureScreenCoordinate? arg_coordinate =
-              (args[0] as GestureScreenCoordinate?);
+          final MapContentGestureContext? arg_coordinate =
+              (args[0] as MapContentGestureContext?);
 
           assert(arg_coordinate != null,
-              'Argument for dev.flutter.pigeon.mapbox_maps_flutter.GestureListener.$name was null, expected non-null ScreenCoordinate.');
+              'Argument for dev.flutter.pigeon.mapbox_maps_flutter.GestureListener.$name$messageChannelSuffix was null, expected non-null ScreenCoordinate.');
 
           try {
             callback(arg_coordinate!);
