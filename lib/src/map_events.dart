@@ -57,7 +57,7 @@ final class _MapEvents {
       onStyleImageMissingListener: _MapEvent.styleImageMissing,
       onStyleImageUnusedListener: _MapEvent.styleImageRemoveUnused,
       onResourceRequestListener: _MapEvent.resourceRequest,
-      onLocationChangeListener: _MapEvents.locationChange,
+      onLocationChangeListener: _MapEvent.locationChange,
     };
     listenersMap.remove(null);
 
@@ -85,6 +85,7 @@ final class _MapEvents {
     _onStyleImageMissingListener = onStyleImageMissingListener;
     _onStyleImageUnusedListener = onStyleImageUnusedListener;
     _onResourceRequestListener = onResourceRequestListener;
+    _onLocationChangeListener = onLocationChangeListener;
 
     _eventTypes = newEventTypes;
   }
@@ -168,6 +169,10 @@ final class _MapEvents {
       case _MapEvent.resourceRequest:
         _onResourceRequestListener
             ?.call(ResourceEventData.fromJson(jsonDecode(call.arguments)));
+        break;
+      case _MapEvent.locationChange:
+        _onLocationChangeListener
+            ?.call(LocationChangeEventData.fromJson(jsonDecode(call.arguments)));
         break;
     }
   }

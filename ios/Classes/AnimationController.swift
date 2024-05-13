@@ -14,7 +14,7 @@ final class AnimationController: _AnimationManager {
         }
 
         if mapAnimationOptions != nil && mapAnimationOptions!.curve != nil {
-            curve = UIView.AnimationCurve(rawValue: mapAnimationOptions!.curve!.intValue) ?? curve
+            curve = UIView.AnimationCurve(rawValue: Int(mapAnimationOptions!.curve!)) ?? curve
         }
 
         cancelable = camera.ease(to: cameraOptions.toCameraOptions(), duration: cameraDuration, curve: curve)

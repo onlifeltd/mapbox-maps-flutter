@@ -65,15 +65,15 @@ class ClusterPointAnnotationPageBodyState
       _createOneAnnotation(list);
       var options = <PointAnnotationOptions>[];
       for (var i = 0; i < 1000; i++) {
-        options.add(PointAnnotationOptions(
-            geometry: createRandomPoint().toJson(), image: list));
+        options.add(
+            PointAnnotationOptions(geometry: createRandomPoint(), image: list));
       }
       pointAnnotationManager?.createMulti(options);
 
       var carOptions = <PointAnnotationOptions>[];
       for (var i = 0; i < 20; i++) {
         carOptions.add(PointAnnotationOptions(
-            geometry: createRandomPoint().toJson(), iconImage: "car-15"));
+            geometry: createRandomPoint(), iconImage: "car-15"));
       }
       pointAnnotationManager?.createMulti(carOptions);
       pointAnnotationManager
@@ -82,9 +82,10 @@ class ClusterPointAnnotationPageBodyState
   }
 
   // Callback for handling cluster tap
-  Future<void> onTapListener(ScreenCoordinate coord) async {
+  Future<void> onTapListener(MapContentGestureContext context) async {
+    ScreenCoordinate coord = context.touchPosition;
     final ScreenCoordinate conv = await mapboxMap!.pixelForCoordinate(
-      Point(coordinates: Position(coord.y, coord.x)).toJson(),
+      Point(coordinates: Position(coord.y, coord.x)),
     );
 
     final features = await mapboxMap!.queryRenderedFeatures(
@@ -106,12 +107,12 @@ class ClusterPointAnnotationPageBodyState
           .getGeoJsonClusterExpansionZoom(pointAnnotationManager!.id, feature);
 
       final Map<String, dynamic> normalizedFeature = Map.castFrom(feature);
-      final Map<String?, Object?> point =
+      final Map<String, Object> point =
           Map.castFrom(normalizedFeature['geometry']);
 
       mapboxMap!.flyTo(
           CameraOptions(
-            center: point,
+            center: Point.fromJson(point),
             zoom: double.parse(result.value!),
           ),
           MapAnimationOptions(duration: 1000));
@@ -125,7 +126,7 @@ class ClusterPointAnnotationPageBodyState
                 coordinates: Position(
               0.381457,
               6.687337,
-            )).toJson(),
+            )),
             textField: "custom-icon",
             textOffset: [0.0, -2.0],
             textColor: Colors.red.value,

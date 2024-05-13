@@ -81,7 +81,7 @@ class PointAnnotationPageBodyState extends State<PointAnnotationPageBody> {
         .then((value) {
       mapboxMap?.flyTo(
           CameraOptions(
-            center: Point(coordinates: Position(0.381457, 6.687337)).toJson(),
+            center: Point(coordinates: Position(0.381457, 6.687337)),
             zoom: 3.0,
           ),
           null);
