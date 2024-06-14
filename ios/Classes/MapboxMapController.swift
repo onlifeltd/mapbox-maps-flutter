@@ -68,7 +68,8 @@ final class MapboxMapController: NSObject, FlutterPlatformView {
         self.eventHandler = MapboxEventHandler(
             eventProvider: mapboxMap,
             binaryMessenger: proxyBinaryMessenger,
-            eventTypes: eventTypes
+            eventTypes: eventTypes,
+            location: mapView.location
         )
 
         let styleController = StyleController(styleManager: mapboxMap)
@@ -134,9 +135,20 @@ final class MapboxMapController: NSObject, FlutterPlatformView {
             } catch {
                 result(FlutterError(code: "2342345", message: error.localizedDescription, details: nil))
             }
+        case "setStyleImportConfigProperty":
+            setStyleImportConfigProperty(methodCall: methodCall)
+            result(nil)
         default:
             result(FlutterMethodNotImplemented)
         }
+    }
+
+    private func setStyleImportConfigProperty(methodCall: FlutterMethodCall) {
+        guard let arguments = methodCall.arguments as? [String: Any] else { return }
+        guard let config = arguments["config"] as? String else { return }
+        guard let value = arguments["value"] else { return }
+
+        try? self.mapView.mapboxMap.setStyleImportConfigProperty(for: "basemap", config: config, value: value)
     }
 
     private func releaseMethodChannels() {

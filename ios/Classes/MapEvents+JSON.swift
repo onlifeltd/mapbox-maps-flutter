@@ -205,6 +205,15 @@ extension MapEventEncodable {
     }
 }
 
+extension Location: MapEventEncodable {
+    var toJSON: [String: Any?] {
+        [
+          "latitude": coordinate.latitude,
+          "longitude": coordinate.longitude,
+        ]
+    }
+}
+
 // MARK: Date
 
 private extension Date {

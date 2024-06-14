@@ -1,11 +1,9 @@
 // This file is generated.
-import 'dart:convert';
 import 'package:flutter/material.dart' hide Visibility;
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:mapbox_maps_example/empty_map_widget.dart' as app;
+import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +25,7 @@ void main() {
       minZoom: 1.0,
       maxZoom: 20.0,
       slot: LayerSlot.BOTTOM,
-      heatmapColor: Colors.red.value,
+      heatmapColor: 'Colors.red.value',
       heatmapIntensity: 1.0,
       heatmapOpacity: 1.0,
       heatmapRadius: 1.0,

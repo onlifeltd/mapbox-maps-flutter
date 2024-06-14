@@ -60,7 +60,12 @@ final class PointAnnotationController: _PointAnnotationMessenger {
                     throw AnnotationControllerError.noAnnotationFound
                 }
 
-                let updatedAnnotation = annotation.toPointAnnotation()
+                var updatedAnnotation = annotation.toPointAnnotation()
+
+                if updatedAnnotation.image == nil && updatedAnnotation.iconImage == nil {
+                    updatedAnnotation.image = manager.annotations[index!].image
+                    updatedAnnotation.iconImage = manager.annotations[index!].iconImage
+                }
 
                 manager.annotations[index!] = updatedAnnotation
                 completion(.success(()))

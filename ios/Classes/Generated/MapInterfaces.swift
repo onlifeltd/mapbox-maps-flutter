@@ -321,6 +321,7 @@ enum _MapEvent: Int {
   case renderFrameStarted = 11
   case renderFrameFinished = 12
   case resourceRequest = 13
+  case locationChange = 14
 }
 
 /// Various options needed for tile cover.
@@ -600,20 +601,27 @@ struct MapAnimationOptions {
   /// The amount of time, in milliseconds, to delay starting the animation after animation start.
   /// If not set explicitly default startDelay will be taken 0ms. This only works for Android.
   var startDelay: Int64?
+    
+  /// curve value 0 - easeInOut, 1 - easeIn, 2 - easeOut, 3 - linear
+  var curve: Int64?
+
 
   static func fromList(_ list: [Any?]) -> MapAnimationOptions? {
     let duration: Int64? = isNullish(list[0]) ? nil : (list[0] is Int64? ? list[0] as! Int64? : Int64(list[0] as! Int32))
     let startDelay: Int64? = isNullish(list[1]) ? nil : (list[1] is Int64? ? list[1] as! Int64? : Int64(list[1] as! Int32))
+    let curve: Int64? = isNullish(list[2]) ? nil : (list[2] is Int64? ? list[2] as! Int64? : Int64(list[2] as! Int32))
 
     return MapAnimationOptions(
       duration: duration,
-      startDelay: startDelay
+      startDelay: startDelay,
+      curve: curve
     )
   }
   func toList() -> [Any?] {
     return [
       duration,
       startDelay,
+      curve,
     ]
   }
 }
