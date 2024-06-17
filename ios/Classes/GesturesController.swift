@@ -6,21 +6,34 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
 
     private var onGestureListener: GestureListener?
 
-    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didBegin gestureType: MapboxMaps.GestureType) {}
+    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didBegin gestureType: MapboxMaps.GestureType) {
+      let touchPoint = gestureManager.singleTapGestureRecognizer.location(in: mapView)
+      let point = Point(mapView.mapboxMap.coordinate(for: touchPoint))
+      let context = MapContentGestureContext(touchPosition: touchPoint.toFLTScreenCoordinate(), point: point)
+
+      onGestureListener?.onGestureDidBegin(context: context, completion: { _ in })
+    
+      guard gestureType == .singleTap else {
+          return
+      }
+      onGestureListener?.onTap(context: context, completion: { _ in })
+    }
 
     func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didEnd gestureType: MapboxMaps.GestureType, willAnimate: Bool) {
-        guard gestureType == .singleTap else {
-            return
-        }
-
         let touchPoint = gestureManager.singleTapGestureRecognizer.location(in: mapView)
         let point = Point(mapView.mapboxMap.coordinate(for: touchPoint))
         let context = MapContentGestureContext(touchPosition: touchPoint.toFLTScreenCoordinate(), point: point)
 
-        onGestureListener?.onTap(context: context, completion: { _ in })
+        onGestureListener?.onGestureDidEnd(context: context, completion: { _ in })
     }
 
-    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didEndAnimatingFor gestureType: MapboxMaps.GestureType) {}
+    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didEndAnimatingFor gestureType: MapboxMaps.GestureType) {
+        let touchPoint = gestureManager.singleTapGestureRecognizer.location(in: mapView)
+        let point = Point(mapView.mapboxMap.coordinate(for: touchPoint))
+        let context = MapContentGestureContext(touchPosition: touchPoint.toFLTScreenCoordinate(), point: point)
+
+        onGestureListener?.onGestureDidEndAnimating(context: context, completion: { _ in })
+    }
 
     @objc private func onMapPan(_ sender: UIPanGestureRecognizer) {
         guard sender.state == .began || sender.state == .changed || sender.state == .ended else {
@@ -142,5 +155,12 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
 
     init(withMapView mapView: MapView) {
         self.mapView = mapView
+    }
+}
+
+
+extension MapboxMaps.GestureType {
+    var index: Int32 {
+        return Int32(MapboxMaps.GestureType.allCases.firstIndex(of: self) ?? 0)
     }
 }

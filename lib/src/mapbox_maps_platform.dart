@@ -105,13 +105,16 @@ class _MapboxMapsPlatform {
   }
 
   Future<dynamic> createAnnotationManager(String type,
-      {String? id, String? belowLayerId}) async {
+      {String? id,
+      String? belowLayerId,
+      ClusterOptions? clusterOptions}) async {
     try {
       return _channel
           .invokeMethod('annotation#create_manager', <String, dynamic>{
         'type': type,
         'id': id,
         'belowLayerId': belowLayerId,
+        if (clusterOptions != null) 'clusterOptions': clusterOptions.toMap(),
       });
     } on PlatformException catch (e) {
       return new Future.error(e);
@@ -147,6 +150,16 @@ class _MapboxMapsPlatform {
     try {
       final List<int> data = await _channel.invokeMethod('map#snapshot');
       return Uint8List.fromList(data);
+    } on PlatformException catch (e) {
+      return new Future.error(e);
+    }
+  }
+
+  Future<dynamic> setStyleImportConfigProperty(
+      String config, dynamic value) async {
+    try {
+      return _channel.invokeMethod('setStyleImportConfigProperty',
+          <String, dynamic>{'config': config, 'value': value});
     } on PlatformException catch (e) {
       return new Future.error(e);
     }

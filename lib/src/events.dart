@@ -100,6 +100,24 @@ class CameraChangedEventData {
       : timestamp = json['timestamp'];
 }
 
+/// The class for location-changed event in Observer
+class LocationChangeEventData {
+  /// Representing latitude taken at the time of an event creation
+  final double latitude;
+
+  /// Representing longitude taken at the time of an event creation
+  final double longitude;
+
+  LocationChangeEventData.fromJson(Map<String, dynamic> json)
+      : latitude = json['latitude'],
+        longitude = json['longitude'];
+
+  @override
+  String toString() {
+    return '[$runtimeType]: latitude = $latitude, longitude = $longitude';
+  }
+}
+
 /// The class for map-idle event in Observer
 class MapIdleEventData {
   /// The timestamp of the `MapIdle` event.

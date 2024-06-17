@@ -63,7 +63,20 @@ final class StyleController: StyleManager {
     func addStyleLayer(properties: String, layerPosition: LayerPosition?, completion: @escaping (Result<Void, Error>) -> Void) {
         do {
             let layerProperties: [String: Any] = convertStringToDictionary(properties: properties)
-            try styleManager.addLayer(with: layerProperties, layerPosition: layerPosition?.toLayerPosition())
+
+            if var layer = try? HeatmapLayer(jsonObject: layerProperties), layer.type == LayerType.heatmap {
+                if case let .constant(v) = (layer as HeatmapLayer).heatmapColor {
+                    if let expressionData = v.rawValue.data(using: .utf8) {
+                        if let expression = try? JSONDecoder().decode(Expression.self, from: expressionData) {
+                            layer.heatmapColor = .expression(expression)
+                        }
+                    }
+                }
+                try styleManager.addLayer(with: layer.allStyleProperties(), layerPosition: layerPosition?.toLayerPosition())
+            } else {
+                try styleManager.addLayer(with: layerProperties, layerPosition: layerPosition?.toLayerPosition())
+            }
+
             completion(.success(()))
         } catch {
             completion(.failure(FlutterError(code: StyleController.errorCode, message: error.localizedDescription, details: nil)))

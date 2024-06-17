@@ -15,6 +15,7 @@ final class _MapEvents {
   OnStyleImageMissingListener? _onStyleImageMissingListener;
   OnStyleImageUnusedListener? _onStyleImageUnusedListener;
   OnResourceRequestListener? _onResourceRequestListener;
+  OnLocationChangeListener? _onLocationChangeListener;
   late final MethodChannel _channel;
   List<_MapEvent> _subscribedEventTypes = [];
 
@@ -34,6 +35,7 @@ final class _MapEvents {
       _onStyleImageMissingListener: _MapEvent.styleImageMissing,
       _onStyleImageUnusedListener: _MapEvent.styleImageRemoveUnused,
       _onResourceRequestListener: _MapEvent.resourceRequest,
+      _onLocationChangeListener: _MapEvent.locationChange,
     };
     listenersMap.remove(null);
 
@@ -87,6 +89,10 @@ final class _MapEvents {
       case _MapEvent.cameraChanged:
         _onCameraChangeListener
             ?.call(CameraChangedEventData.fromJson(jsonDecode(call.arguments)));
+        break;
+      case _MapEvent.locationChange:
+        _onLocationChangeListener?.call(
+            LocationChangeEventData.fromJson(jsonDecode(call.arguments)));
         break;
       case _MapEvent.mapIdle:
         _onMapIdleListener

@@ -44,10 +44,12 @@ final class MapboxEventHandler {
     private let binaryMessenger: FlutterBinaryMessenger
     private let channel: FlutterMethodChannel
     private var cancelables = Set<AnyCancelable>()
+    private let location: LocationManager?
 
-    init(eventProvider: EventProvider, binaryMessenger: FlutterBinaryMessenger, eventTypes: [Int]) {
+  init(eventProvider: EventProvider, binaryMessenger: FlutterBinaryMessenger, eventTypes: [Int], location: LocationManager?) {
         self.eventProvider = eventProvider
         self.binaryMessenger = binaryMessenger
+        self.location = location
 
         channel = FlutterMethodChannel(
             name: "com.mapbox.maps.flutter.map_events",
@@ -134,6 +136,10 @@ final class MapboxEventHandler {
         case .resourceRequest:
             eventProvider.onResourceRequest.observe { [weak self] payload in
                 self?.channel.invokeMethod(event.methodName, arguments: payload.toJSONString)
+            }.store(in: &cancelables)
+        case .locationChange:
+            location?.onLocationChange.observe { [weak self] payload in
+              self?.channel.invokeMethod(event.methodName, arguments: payload.last?.toJSONString)
             }.store(in: &cancelables)
         }
     }

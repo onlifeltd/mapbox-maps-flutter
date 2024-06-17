@@ -13,7 +13,7 @@ class HeatmapLayer extends Layer {
     String? slot,
     required String this.sourceId,
     String? this.sourceLayer,
-    int? this.heatmapColor,
+    String? this.heatmapColor,
     List<Object>? this.heatmapColorExpression,
     double? this.heatmapIntensity,
     List<Object>? this.heatmapIntensityExpression,
@@ -42,7 +42,7 @@ class HeatmapLayer extends Layer {
   String? sourceLayer;
 
   /// Defines the color of each pixel based on its density value in a heatmap. Should be an expression that uses `["heatmap-density"]` as input.
-  int? heatmapColor;
+  String? heatmapColor;
 
   /// Defines the color of each pixel based on its density value in a heatmap. Should be an expression that uses `["heatmap-density"]` as input.
   List<Object>? heatmapColorExpression;
@@ -87,7 +87,7 @@ class HeatmapLayer extends Layer {
       paint["heatmap-color"] = heatmapColorExpression;
     }
     if (heatmapColor != null) {
-      paint["heatmap-color"] = heatmapColor?.toRGBA();
+      paint["heatmap-color"] = heatmapColor;
     }
 
     if (heatmapIntensityExpression != null) {
@@ -167,7 +167,7 @@ class HeatmapLayer extends Layer {
               .contains(map["layout"]["visibility"])),
       visibilityExpression: _optionalCastList(map["layout"]["visibility"]),
       filter: _optionalCastList(map["filter"]),
-      heatmapColor: (map["paint"]["heatmap-color"] as List?)?.toRGBAInt(),
+      heatmapColor: (map["paint"]["heatmap-color"] as String?),
       heatmapColorExpression: _optionalCastList(map["paint"]["heatmap-color"]),
       heatmapIntensity: _optionalCast(map["paint"]["heatmap-intensity"]),
       heatmapIntensityExpression:

@@ -11,9 +11,9 @@ class _AnnotationManager {
   /// If [id] is specified, the string is used as an identifier for a layer and a source backing the create manager.
   /// Use [below] to specify the id of the layer above the annotation layer.
   Future<PointAnnotationManager> createPointAnnotationManager(
-      {String? id, String? below}) async {
+      {String? id, String? below, ClusterOptions? clusterOptions}) async {
     return _mapboxMapsPlatform
-        .createAnnotationManager('point', id: id, belowLayerId: below)
+        .createAnnotationManager('point', id: id, belowLayerId: below, clusterOptions: clusterOptions)
         .then((value) => PointAnnotationManager(
             id: value, messenger: _mapboxMapsPlatform.binaryMessenger));
   }
