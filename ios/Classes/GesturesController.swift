@@ -2,9 +2,16 @@ import Foundation
 @_spi(Experimental) import MapboxMaps
 import Flutter
 
-final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRecognizerDelegate, GestureManagerDelegate {
+final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRecognizerDelegate {
 
+    private var cancelables: Set<AnyCancelable> = []
     private var onGestureListener: GestureListener?
+
+    private let mapView: MapView
+
+    init(withMapView mapView: MapView) {
+        self.mapView = mapView
+    }
 
     func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didBegin gestureType: MapboxMaps.GestureType) {
       let touchPoint = gestureManager.singleTapGestureRecognizer.location(in: mapView)
@@ -12,7 +19,7 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
       let context = MapContentGestureContext(touchPosition: touchPoint.toFLTScreenCoordinate(), point: point)
 
       onGestureListener?.onGestureDidBegin(context: context, completion: { _ in })
-    
+
       guard gestureType == .singleTap else {
           return
       }
@@ -45,16 +52,6 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
         let context = MapContentGestureContext(touchPosition: touchPoint.toFLTScreenCoordinate(), point: point)
 
         onGestureListener?.onScroll(context: context, completion: { _ in })
-    }
-
-    @objc private func onMapLongTap(_ sender: UITapGestureRecognizer) {
-        guard sender.state == .ended else { return }
-
-        let touchPoint = sender.location(in: mapView)
-        let point = Point(mapView.mapboxMap.coordinate(for: touchPoint))
-        let context = MapContentGestureContext(touchPosition: touchPoint.toFLTScreenCoordinate(), point: point)
-
-        onGestureListener?.onLongTap(context: context, completion: { _ in })
     }
 
     func updateSettings(settings: GesturesSettings) throws {
@@ -137,24 +134,24 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
 
     func addListeners(messenger: FlutterBinaryMessenger) {
         removeListeners()
-        gestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(onMapLongTap))
-        mapView.addGestureRecognizer(gestureRecognizer!)
-        mapView.gestures.delegate = self
-        onGestureListener = GestureListener(binaryMessenger: messenger)
         mapView.gestures.panGestureRecognizer.addTarget(self, action: #selector(onMapPan))
+
+        onGestureListener = GestureListener(binaryMessenger: messenger)
+
+        mapView.gestures.onMapTap.observe { [weak self] context in
+            guard let self else { return }
+            self.onGestureListener?.onTap(context: context.toFLTMapContentGestureContext()) { _ in }
+        }
+        .store(in: &cancelables)
+        mapView.gestures.onMapLongPress.observe { [weak self] context in
+            guard let self else { return }
+            self.onGestureListener?.onLongTap(context: context.toFLTMapContentGestureContext()) { _ in }
+        }
+        .store(in: &cancelables)
     }
 
     func removeListeners() {
-        if let gestureRecognizer = self.gestureRecognizer {
-            mapView.removeGestureRecognizer(gestureRecognizer)
-        }
-    }
-
-    private var mapView: MapView
-    private var gestureRecognizer: UIGestureRecognizer?
-
-    init(withMapView mapView: MapView) {
-        self.mapView = mapView
+        cancelables = []
     }
 }
 
