@@ -766,6 +766,100 @@ class PointAnnotationOptions {
   }
 }
 
+/// Options to configure point annotation clustering with PointAnnotationManager.
+///
+/// ClusterOptions exposes a minimal of configuration options, a more advanced setup can be created manually with
+/// using CircleLayer and SymbolLayers directly.
+class ClusterOptions {
+  ClusterOptions({
+    this.circleRadiusExpression,
+    this.circleColorExpression,
+    this.textColorExpression,
+    this.textSizeExpression,
+    this.textFieldExpression,
+    this.clusterMaxZoom,
+    this.clusterRadius,
+    // this.clusterProperties,
+  });
+
+  /// The circle radius of the cluster items, 18 by default. Units in pixels.
+  final String? circleRadiusExpression;
+
+  /// The circle color, black by default.
+  final String? circleColorExpression;
+
+  /// The text color of cluster item, white by default
+  final String? textColorExpression;
+
+  /// The text size of cluster item, 12 by default. Units in pixels.
+  final String? textSizeExpression;
+
+  /// Value to use for a text label of the cluster. `get("point_count")` by default which
+  /// will show the count of points in the cluster
+  final String? textFieldExpression;
+
+  /// Radius of each cluster if clustering is enabled. A value of 512 indicates a radius equal
+  /// to the width of a tile, 50 by default. Value must be greater than or equal to 0.
+  final double? clusterRadius;
+
+  /// Max zoom on which to cluster points if clustering is enabled. Defaults to one zoom less
+  /// than maxzoom (so that last zoom features are not clustered). Clusters are re-evaluated at integer zoom
+  /// levels so setting clusterMaxZoom to 14 means the clusters will be displayed until z15.
+  final double? clusterMaxZoom;
+
+  /// An object defining custom properties on the generated clusters if clustering is enabled, aggregating values from
+  /// clustered points. Has the form `{"property_name": [operator, map_expression]}`.
+  /// `operator` is any expression function that accepts at
+  /// least 2 operands (e.g. `"+"` or `"max"`) — it accumulates the property value from clusters/points the
+  /// cluster contains; `map_expression` produces the value of a single point. Example:
+  ///
+  /// ``Expression`` syntax:
+  /// ```
+  /// let expression = Exp(.sum) {
+  ///     Exp(.get) { "scalerank" }
+  /// }
+  /// clusterProperties: ["sum": expression]
+  /// ```
+  ///
+  /// JSON syntax:
+  /// `{"sum": ["+", ["get", "scalerank"]]}`
+  ///
+  /// For more advanced use cases, in place of `operator`, you can use a custom reduce expression that references a special `["accumulated"]` value. Example:
+  ///
+  /// ``Expression`` syntax:
+  /// ```
+  /// let expression = Exp {
+  ///     Exp(.sum) {
+  ///         Exp(.accumulated)
+  ///         Exp(.get) { "sum" }
+  ///     }
+  ///     Exp(.get) { "scalerank" }
+  /// }
+  /// clusterProperties: ["sum": expression]
+  /// ```
+  ///
+  /// JSON syntax:
+  /// `{"sum": [["+", ["accumulated"], ["get", "sum"]], ["get", "scalerank"]]}`
+  // final Map<String, String>? clusterProperties;
+
+  Map<String, dynamic> toMap() {
+    return {
+      if (circleRadiusExpression != null)
+        'circleRadiusExpression': circleRadiusExpression,
+      if (circleColorExpression != null)
+        'circleColorExpression': circleColorExpression,
+      if (textColorExpression != null)
+        'textColorExpression': textColorExpression,
+      if (textSizeExpression != null) 'textSizeExpression': textSizeExpression,
+      if (textFieldExpression != null)
+        'textFieldExpression': textFieldExpression,
+      if (clusterMaxZoom != null) 'clusterMaxZoom': clusterMaxZoom,
+      if (clusterRadius != null) 'clusterRadius': clusterRadius,
+      // if (clusterProperties != null) 'clusterProperties': clusterProperties,
+    };
+  }
+}
+
 class _OnPointAnnotationClickListenerCodec extends StandardMessageCodec {
   const _OnPointAnnotationClickListenerCodec();
   @override
