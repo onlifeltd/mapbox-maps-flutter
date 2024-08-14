@@ -6,10 +6,40 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
 
     private var cancelables: Set<AnyCancelable> = []
     private var onGestureListener: GestureListener?
+
     private let mapView: MapView
 
     init(withMapView mapView: MapView) {
         self.mapView = mapView
+    }
+
+    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didBegin gestureType: MapboxMaps.GestureType) {
+      let touchPoint = gestureManager.singleTapGestureRecognizer.location(in: mapView)
+      let point = Point(mapView.mapboxMap.coordinate(for: touchPoint))
+      let context = MapContentGestureContext(touchPosition: touchPoint.toFLTScreenCoordinate(), point: point)
+
+      onGestureListener?.onGestureDidBegin(context: context, completion: { _ in })
+
+      guard gestureType == .singleTap else {
+          return
+      }
+      onGestureListener?.onTap(context: context, completion: { _ in })
+    }
+
+    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didEnd gestureType: MapboxMaps.GestureType, willAnimate: Bool) {
+        let touchPoint = gestureManager.singleTapGestureRecognizer.location(in: mapView)
+        let point = Point(mapView.mapboxMap.coordinate(for: touchPoint))
+        let context = MapContentGestureContext(touchPosition: touchPoint.toFLTScreenCoordinate(), point: point)
+
+        onGestureListener?.onGestureDidEnd(context: context, completion: { _ in })
+    }
+
+    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didEndAnimatingFor gestureType: MapboxMaps.GestureType) {
+        let touchPoint = gestureManager.singleTapGestureRecognizer.location(in: mapView)
+        let point = Point(mapView.mapboxMap.coordinate(for: touchPoint))
+        let context = MapContentGestureContext(touchPosition: touchPoint.toFLTScreenCoordinate(), point: point)
+
+        onGestureListener?.onGestureDidEndAnimating(context: context, completion: { _ in })
     }
 
     @objc private func onMapPan(_ sender: UIPanGestureRecognizer) {
@@ -122,5 +152,12 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
 
     func removeListeners() {
         cancelables = []
+    }
+}
+
+
+extension MapboxMaps.GestureType {
+    var index: Int32 {
+        return Int32(MapboxMaps.GestureType.allCases.firstIndex(of: self) ?? 0)
     }
 }
