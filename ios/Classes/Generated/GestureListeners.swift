@@ -120,7 +120,11 @@ protocol GestureListenerProtocol {
   func onTap(context contextArg: MapContentGestureContext, completion: @escaping (Result<Void, GestureListenersError>) -> Void)
   func onLongTap(context contextArg: MapContentGestureContext, completion: @escaping (Result<Void, GestureListenersError>) -> Void)
   func onScroll(context contextArg: MapContentGestureContext, completion: @escaping (Result<Void, GestureListenersError>) -> Void)
+  func onGestureDidBegin(context contextArg: MapContentGestureContext, completion: @escaping (Result<Void, GestureListenersError>) -> Void)
+  func onGestureDidEnd(context contextArg: MapContentGestureContext, completion: @escaping (Result<Void, GestureListenersError>) -> Void)
+  func onGestureDidEndAnimating(context contextArg: MapContentGestureContext, completion: @escaping (Result<Void, GestureListenersError>) -> Void)
 }
+
 class GestureListener: GestureListenerProtocol {
   private let binaryMessenger: FlutterBinaryMessenger
   private let messageChannelSuffix: String
@@ -184,5 +188,36 @@ class GestureListener: GestureListenerProtocol {
         completion(.success(Void()))
       }
     }
+  }
+
+  func onGestureDidBegin(context contextArg: MapContentGestureContext, completion: @escaping (Result<Void, GestureListenersError>) -> Void) {
+      _handleMapGesture(gestureName: "onGestureDidBegin", context: contextArg, completion: completion)
+  }
+
+  func onGestureDidEnd(context contextArg: MapContentGestureContext, completion: @escaping (Result<Void, GestureListenersError>) -> Void) {
+      _handleMapGesture(gestureName: "onGestureDidEnd", context: contextArg, completion: completion)
+  }
+
+  func onGestureDidEndAnimating(context contextArg: MapContentGestureContext, completion: @escaping (Result<Void, GestureListenersError>) -> Void) {
+      _handleMapGesture(gestureName: "onGestureDidEndAnimating", context: contextArg, completion: completion)
+  }
+
+  func _handleMapGesture(gestureName: String, context contextArg: MapContentGestureContext, completion: @escaping (Result<Void, GestureListenersError>) -> Void) {
+      let channelName: String = "dev.flutter.pigeon.mapbox_maps_flutter.GestureListener.\(gestureName)\(messageChannelSuffix)"
+      let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+      channel.sendMessage([contextArg] as [Any?]) { response in
+          guard let listResponse = response as? [Any?] else {
+              completion(.failure(createConnectionError(withChannelName: channelName)))
+              return
+          }
+          if listResponse.count > 1 {
+              let code: String = listResponse[0] as! String
+              let message: String? = nilOrValue(listResponse[1])
+              let details: String? = nilOrValue(listResponse[2])
+              completion(.failure(GestureListenersError(code: code, message: message, details: details)))
+          } else {
+              completion(.success(Void()))
+          }
+      }
   }
 }

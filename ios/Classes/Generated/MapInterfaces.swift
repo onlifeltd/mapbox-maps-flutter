@@ -373,6 +373,7 @@ enum _MapEvent: Int {
   case renderFrameStarted = 11
   case renderFrameFinished = 12
   case resourceRequest = 13
+  case locationChange = 14
 }
 
 /// Describes the glyphs rasterization option values.
@@ -685,20 +686,26 @@ struct MapAnimationOptions {
   /// If not set explicitly default startDelay will be taken 0ms. This only works for Android.
   var startDelay: Int64?
 
+  /// curve value 0 - easeInOut, 1 - easeIn, 2 - easeOut, 3 - linear
+  var curve: Int64?
+
   // swift-format-ignore: AlwaysUseLowerCamelCase
   static func fromList(_ __pigeon_list: [Any?]) -> MapAnimationOptions? {
     let duration: Int64? = isNullish(__pigeon_list[0]) ? nil : (__pigeon_list[0] is Int64? ? __pigeon_list[0] as! Int64? : Int64(__pigeon_list[0] as! Int32))
     let startDelay: Int64? = isNullish(__pigeon_list[1]) ? nil : (__pigeon_list[1] is Int64? ? __pigeon_list[1] as! Int64? : Int64(__pigeon_list[1] as! Int32))
+    let curve: Int64? = isNullish(__pigeon_list[2]) ? nil : (__pigeon_list[2] is Int64? ? __pigeon_list[2] as! Int64? : Int64(__pigeon_list[2] as! Int32))
 
     return MapAnimationOptions(
       duration: duration,
-      startDelay: startDelay
+      startDelay: startDelay,
+      curve: curve
     )
   }
   func toList() -> [Any?] {
     return [
       duration,
       startDelay,
+      curve,
     ]
   }
 }

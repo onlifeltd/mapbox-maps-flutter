@@ -756,6 +756,96 @@ class PointAnnotationOptions {
   }
 }
 
+/// Options to configure point annotation clustering with PointAnnotationManager.
+///
+/// ClusterOptions exposes a minimal of configuration options, a more advanced setup can be created manually with
+/// using CircleLayer and SymbolLayers directly.
+class ClusterOptions {
+  ClusterOptions({
+    this.circleRadiusExpression,
+    this.circleColorExpression,
+    this.textColorExpression,
+    this.textSizeExpression,
+    this.textFieldExpression,
+    this.clusterMaxZoom,
+    this.clusterRadius,
+    // this.clusterProperties,
+  });
+
+  /// The circle radius of the cluster items, 18 by default. Units in pixels.
+  final String? circleRadiusExpression;
+
+  /// The circle color, black by default.
+  final String? circleColorExpression;
+
+  /// The text color of cluster item, white by default
+  final String? textColorExpression;
+
+  /// The text size of cluster item, 12 by default. Units in pixels.
+  final String? textSizeExpression;
+
+  /// Value to use for a text label of the cluster. `get("point_count")` by default which
+  /// will show the count of points in the cluster
+  final String? textFieldExpression;
+
+  /// Radius of each cluster if clustering is enabled. A value of 512 indicates a radius equal
+  /// to the width of a tile, 50 by default. Value must be greater than or equal to 0.
+  final double? clusterRadius;
+
+  /// Max zoom on which to cluster points if clustering is enabled. Defaults to one zoom less
+  /// than maxzoom (so that last zoom features are not clustered). Clusters are re-evaluated at integer zoom
+  /// levels so setting clusterMaxZoom to 14 means the clusters will be displayed until z15.
+  final double? clusterMaxZoom;
+
+  /// An object defining custom properties on the generated clusters if clustering is enabled, aggregating values from
+  /// clustered points. Has the form `{"property_name": [operator, map_expression]}`.
+  /// `operator` is any expression function that accepts at
+  /// least 2 operands (e.g. `"+"` or `"max"`) — it accumulates the property value from clusters/points the
+  /// cluster contains; `map_expression` produces the value of a single point. Example:
+  ///
+  /// ``Expression`` syntax:
+  /// ```
+  /// let expression = Exp(.sum) {
+  ///     Exp(.get) { "scalerank" }
+  /// }
+  /// clusterProperties: ["sum": expression]
+  /// ```
+  ///
+  /// JSON syntax:
+  /// `{"sum": ["+", ["get", "scalerank"]]}`
+  ///
+  /// For more advanced use cases, in place of `operator`, you can use a custom reduce expression that references a special `["accumulated"]` value. Example:
+  ///
+  /// ``Expression`` syntax:
+  /// ```
+  /// let expression = Exp {
+  ///     Exp(.sum) {
+  ///         Exp(.accumulated)
+  ///         Exp(.get) { "sum" }
+  ///     }
+  ///     Exp(.get) { "scalerank" }
+  /// }
+  /// clusterProperties: ["sum": expression]
+  /// ```
+  ///
+  /// JSON syntax:
+  /// `{"sum": [["+", ["accumulated"], ["get", "sum"]], ["get", "scalerank"]]}`
+  // final Map<String, String>? clusterProperties;
+
+  Map<String, dynamic> toMap() {
+    return {
+      if (circleRadiusExpression != null) 'circleRadiusExpression': circleRadiusExpression,
+      if (circleColorExpression != null) 'circleColorExpression': circleColorExpression,
+      if (textColorExpression != null) 'textColorExpression': textColorExpression,
+      if (textSizeExpression != null) 'textSizeExpression': textSizeExpression,
+      if (textFieldExpression != null) 'textFieldExpression': textFieldExpression,
+      if (clusterMaxZoom != null) 'clusterMaxZoom': clusterMaxZoom,
+      if (clusterRadius != null) 'clusterRadius': clusterRadius,
+      // if (clusterProperties != null) 'clusterProperties': clusterProperties,
+    };
+  }
+}
+
 class PointAnnotationMessenger_PigeonCodec extends StandardMessageCodec {
   const PointAnnotationMessenger_PigeonCodec();
   @override
@@ -880,8 +970,7 @@ class PointAnnotationMessenger_PigeonCodec extends StandardMessageCodec {
 }
 
 abstract class OnPointAnnotationClickListener {
-  static const MessageCodec<Object?> pigeonChannelCodec =
-      PointAnnotationMessenger_PigeonCodec();
+  static const MessageCodec<Object?> pigeonChannelCodec = PointAnnotationMessenger_PigeonCodec();
 
   void onPointAnnotationClick(PointAnnotation annotation);
 
@@ -890,11 +979,9 @@ abstract class OnPointAnnotationClickListener {
     BinaryMessenger? binaryMessenger,
     String messageChannelSuffix = '',
   }) {
-    messageChannelSuffix =
-        messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
-      final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<
-              Object?>(
+      final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
           'dev.flutter.pigeon.mapbox_maps_flutter.OnPointAnnotationClickListener.onPointAnnotationClick$messageChannelSuffix',
           pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
@@ -914,8 +1001,7 @@ abstract class OnPointAnnotationClickListener {
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
           } catch (e) {
-            return wrapResponse(
-                error: PlatformException(code: 'error', message: e.toString()));
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
           }
         });
       }
@@ -927,30 +1013,26 @@ class _PointAnnotationMessenger {
   /// Constructor for [_PointAnnotationMessenger].  The [binaryMessenger] named argument is
   /// available for dependency injection.  If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
-  _PointAnnotationMessenger(
-      {BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+  _PointAnnotationMessenger({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
       : __pigeon_binaryMessenger = binaryMessenger,
         __pigeon_messageChannelSuffix =
             messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
   final BinaryMessenger? __pigeon_binaryMessenger;
 
-  static const MessageCodec<Object?> pigeonChannelCodec =
-      PointAnnotationMessenger_PigeonCodec();
+  static const MessageCodec<Object?> pigeonChannelCodec = PointAnnotationMessenger_PigeonCodec();
 
   final String __pigeon_messageChannelSuffix;
 
-  Future<PointAnnotation> create(
-      String managerId, PointAnnotationOptions annotationOption) async {
+  Future<PointAnnotation> create(String managerId, PointAnnotationOptions annotationOption) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.create$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, annotationOption]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, annotationOption]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -973,14 +1055,13 @@ class _PointAnnotationMessenger {
       String managerId, List<PointAnnotationOptions?> annotationOptions) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.createMulti$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, annotationOptions]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, annotationOptions]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -995,22 +1076,20 @@ class _PointAnnotationMessenger {
         message: 'Host platform returned null value for non-null return value.',
       );
     } else {
-      return (__pigeon_replyList[0] as List<Object?>?)!
-          .cast<PointAnnotation?>();
+      return (__pigeon_replyList[0] as List<Object?>?)!.cast<PointAnnotation?>();
     }
   }
 
   Future<void> update(String managerId, PointAnnotation annotation) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.update$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, annotation]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, annotation]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1027,14 +1106,13 @@ class _PointAnnotationMessenger {
   Future<void> delete(String managerId, PointAnnotation annotation) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.delete$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, annotation]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, annotation]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1051,8 +1129,7 @@ class _PointAnnotationMessenger {
   Future<void> deleteAll(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.deleteAll$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1072,18 +1149,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setIconAllowOverlap(
-      String managerId, bool iconAllowOverlap) async {
+  Future<void> setIconAllowOverlap(String managerId, bool iconAllowOverlap) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setIconAllowOverlap$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, iconAllowOverlap]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, iconAllowOverlap]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1100,8 +1175,7 @@ class _PointAnnotationMessenger {
   Future<bool?> getIconAllowOverlap(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getIconAllowOverlap$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1121,18 +1195,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setIconIgnorePlacement(
-      String managerId, bool iconIgnorePlacement) async {
+  Future<void> setIconIgnorePlacement(String managerId, bool iconIgnorePlacement) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setIconIgnorePlacement$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, iconIgnorePlacement]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, iconIgnorePlacement]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1149,8 +1221,7 @@ class _PointAnnotationMessenger {
   Future<bool?> getIconIgnorePlacement(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getIconIgnorePlacement$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1170,18 +1241,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setIconKeepUpright(
-      String managerId, bool iconKeepUpright) async {
+  Future<void> setIconKeepUpright(String managerId, bool iconKeepUpright) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setIconKeepUpright$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, iconKeepUpright]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, iconKeepUpright]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1198,8 +1267,7 @@ class _PointAnnotationMessenger {
   Future<bool?> getIconKeepUpright(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getIconKeepUpright$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1222,14 +1290,13 @@ class _PointAnnotationMessenger {
   Future<void> setIconOptional(String managerId, bool iconOptional) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setIconOptional$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, iconOptional]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, iconOptional]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1246,8 +1313,7 @@ class _PointAnnotationMessenger {
   Future<bool?> getIconOptional(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getIconOptional$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1270,14 +1336,13 @@ class _PointAnnotationMessenger {
   Future<void> setIconPadding(String managerId, double iconPadding) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setIconPadding$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, iconPadding]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, iconPadding]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1294,8 +1359,7 @@ class _PointAnnotationMessenger {
   Future<double?> getIconPadding(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getIconPadding$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1319,14 +1383,13 @@ class _PointAnnotationMessenger {
       String managerId, IconPitchAlignment iconPitchAlignment) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setIconPitchAlignment$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, iconPitchAlignment]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, iconPitchAlignment]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1343,8 +1406,7 @@ class _PointAnnotationMessenger {
   Future<IconPitchAlignment?> getIconPitchAlignment(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getIconPitchAlignment$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1368,14 +1430,13 @@ class _PointAnnotationMessenger {
       String managerId, IconRotationAlignment iconRotationAlignment) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setIconRotationAlignment$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, iconRotationAlignment]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, iconRotationAlignment]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1389,12 +1450,10 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<IconRotationAlignment?> getIconRotationAlignment(
-      String managerId) async {
+  Future<IconRotationAlignment?> getIconRotationAlignment(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getIconRotationAlignment$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1414,18 +1473,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setSymbolAvoidEdges(
-      String managerId, bool symbolAvoidEdges) async {
+  Future<void> setSymbolAvoidEdges(String managerId, bool symbolAvoidEdges) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setSymbolAvoidEdges$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, symbolAvoidEdges]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, symbolAvoidEdges]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1442,8 +1499,7 @@ class _PointAnnotationMessenger {
   Future<bool?> getSymbolAvoidEdges(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getSymbolAvoidEdges$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1463,18 +1519,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setSymbolPlacement(
-      String managerId, SymbolPlacement symbolPlacement) async {
+  Future<void> setSymbolPlacement(String managerId, SymbolPlacement symbolPlacement) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setSymbolPlacement$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, symbolPlacement]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, symbolPlacement]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1491,8 +1545,7 @@ class _PointAnnotationMessenger {
   Future<SymbolPlacement?> getSymbolPlacement(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getSymbolPlacement$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1515,14 +1568,13 @@ class _PointAnnotationMessenger {
   Future<void> setSymbolSpacing(String managerId, double symbolSpacing) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setSymbolSpacing$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, symbolSpacing]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, symbolSpacing]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1539,8 +1591,7 @@ class _PointAnnotationMessenger {
   Future<double?> getSymbolSpacing(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getSymbolSpacing$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1563,14 +1614,13 @@ class _PointAnnotationMessenger {
   Future<void> setSymbolZElevate(String managerId, bool symbolZElevate) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setSymbolZElevate$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, symbolZElevate]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, symbolZElevate]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1587,8 +1637,7 @@ class _PointAnnotationMessenger {
   Future<bool?> getSymbolZElevate(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getSymbolZElevate$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1608,18 +1657,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setSymbolZOrder(
-      String managerId, SymbolZOrder symbolZOrder) async {
+  Future<void> setSymbolZOrder(String managerId, SymbolZOrder symbolZOrder) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setSymbolZOrder$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, symbolZOrder]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, symbolZOrder]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1636,8 +1683,7 @@ class _PointAnnotationMessenger {
   Future<SymbolZOrder?> getSymbolZOrder(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getSymbolZOrder$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1657,18 +1703,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setTextAllowOverlap(
-      String managerId, bool textAllowOverlap) async {
+  Future<void> setTextAllowOverlap(String managerId, bool textAllowOverlap) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setTextAllowOverlap$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, textAllowOverlap]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, textAllowOverlap]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1685,8 +1729,7 @@ class _PointAnnotationMessenger {
   Future<bool?> getTextAllowOverlap(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getTextAllowOverlap$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1709,14 +1752,13 @@ class _PointAnnotationMessenger {
   Future<void> setTextFont(String managerId, List<String?> textFont) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setTextFont$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, textFont]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, textFont]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1733,8 +1775,7 @@ class _PointAnnotationMessenger {
   Future<List<String?>?> getTextFont(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getTextFont$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1754,18 +1795,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setTextIgnorePlacement(
-      String managerId, bool textIgnorePlacement) async {
+  Future<void> setTextIgnorePlacement(String managerId, bool textIgnorePlacement) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setTextIgnorePlacement$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, textIgnorePlacement]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, textIgnorePlacement]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1782,8 +1821,7 @@ class _PointAnnotationMessenger {
   Future<bool?> getTextIgnorePlacement(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getTextIgnorePlacement$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1803,18 +1841,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setTextKeepUpright(
-      String managerId, bool textKeepUpright) async {
+  Future<void> setTextKeepUpright(String managerId, bool textKeepUpright) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setTextKeepUpright$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, textKeepUpright]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, textKeepUpright]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1831,8 +1867,7 @@ class _PointAnnotationMessenger {
   Future<bool?> getTextKeepUpright(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getTextKeepUpright$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1855,14 +1890,13 @@ class _PointAnnotationMessenger {
   Future<void> setTextMaxAngle(String managerId, double textMaxAngle) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setTextMaxAngle$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, textMaxAngle]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, textMaxAngle]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1879,8 +1913,7 @@ class _PointAnnotationMessenger {
   Future<double?> getTextMaxAngle(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getTextMaxAngle$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1903,14 +1936,13 @@ class _PointAnnotationMessenger {
   Future<void> setTextOptional(String managerId, bool textOptional) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setTextOptional$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, textOptional]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, textOptional]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1927,8 +1959,7 @@ class _PointAnnotationMessenger {
   Future<bool?> getTextOptional(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getTextOptional$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -1951,14 +1982,13 @@ class _PointAnnotationMessenger {
   Future<void> setTextPadding(String managerId, double textPadding) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setTextPadding$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, textPadding]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, textPadding]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -1975,8 +2005,7 @@ class _PointAnnotationMessenger {
   Future<double?> getTextPadding(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getTextPadding$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -2000,14 +2029,13 @@ class _PointAnnotationMessenger {
       String managerId, TextPitchAlignment textPitchAlignment) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setTextPitchAlignment$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, textPitchAlignment]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, textPitchAlignment]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -2024,8 +2052,7 @@ class _PointAnnotationMessenger {
   Future<TextPitchAlignment?> getTextPitchAlignment(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getTextPitchAlignment$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -2049,14 +2076,13 @@ class _PointAnnotationMessenger {
       String managerId, TextRotationAlignment textRotationAlignment) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setTextRotationAlignment$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, textRotationAlignment]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, textRotationAlignment]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -2070,12 +2096,10 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<TextRotationAlignment?> getTextRotationAlignment(
-      String managerId) async {
+  Future<TextRotationAlignment?> getTextRotationAlignment(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getTextRotationAlignment$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -2095,18 +2119,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setIconColorSaturation(
-      String managerId, double iconColorSaturation) async {
+  Future<void> setIconColorSaturation(String managerId, double iconColorSaturation) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setIconColorSaturation$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, iconColorSaturation]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, iconColorSaturation]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -2123,8 +2145,7 @@ class _PointAnnotationMessenger {
   Future<double?> getIconColorSaturation(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getIconColorSaturation$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -2144,18 +2165,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setIconOcclusionOpacity(
-      String managerId, double iconOcclusionOpacity) async {
+  Future<void> setIconOcclusionOpacity(String managerId, double iconOcclusionOpacity) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setIconOcclusionOpacity$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, iconOcclusionOpacity]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, iconOcclusionOpacity]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -2172,8 +2191,7 @@ class _PointAnnotationMessenger {
   Future<double?> getIconOcclusionOpacity(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getIconOcclusionOpacity$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -2193,18 +2211,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setIconTranslate(
-      String managerId, List<double?> iconTranslate) async {
+  Future<void> setIconTranslate(String managerId, List<double?> iconTranslate) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setIconTranslate$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, iconTranslate]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, iconTranslate]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -2221,8 +2237,7 @@ class _PointAnnotationMessenger {
   Future<List<double?>?> getIconTranslate(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getIconTranslate$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -2246,14 +2261,13 @@ class _PointAnnotationMessenger {
       String managerId, IconTranslateAnchor iconTranslateAnchor) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setIconTranslateAnchor$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, iconTranslateAnchor]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, iconTranslateAnchor]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -2270,8 +2284,7 @@ class _PointAnnotationMessenger {
   Future<IconTranslateAnchor?> getIconTranslateAnchor(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getIconTranslateAnchor$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -2291,18 +2304,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setTextOcclusionOpacity(
-      String managerId, double textOcclusionOpacity) async {
+  Future<void> setTextOcclusionOpacity(String managerId, double textOcclusionOpacity) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setTextOcclusionOpacity$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, textOcclusionOpacity]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, textOcclusionOpacity]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -2319,8 +2330,7 @@ class _PointAnnotationMessenger {
   Future<double?> getTextOcclusionOpacity(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getTextOcclusionOpacity$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -2340,18 +2350,16 @@ class _PointAnnotationMessenger {
     }
   }
 
-  Future<void> setTextTranslate(
-      String managerId, List<double?> textTranslate) async {
+  Future<void> setTextTranslate(String managerId, List<double?> textTranslate) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setTextTranslate$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, textTranslate]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, textTranslate]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -2368,8 +2376,7 @@ class _PointAnnotationMessenger {
   Future<List<double?>?> getTextTranslate(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getTextTranslate$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
@@ -2393,14 +2400,13 @@ class _PointAnnotationMessenger {
       String managerId, TextTranslateAnchor textTranslateAnchor) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.setTextTranslateAnchor$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,
     );
-    final List<Object?>? __pigeon_replyList = await __pigeon_channel
-        .send(<Object?>[managerId, textTranslateAnchor]) as List<Object?>?;
+    final List<Object?>? __pigeon_replyList =
+        await __pigeon_channel.send(<Object?>[managerId, textTranslateAnchor]) as List<Object?>?;
     if (__pigeon_replyList == null) {
       throw _createConnectionError(__pigeon_channelName);
     } else if (__pigeon_replyList.length > 1) {
@@ -2417,8 +2423,7 @@ class _PointAnnotationMessenger {
   Future<TextTranslateAnchor?> getTextTranslateAnchor(String managerId) async {
     final String __pigeon_channelName =
         'dev.flutter.pigeon.mapbox_maps_flutter._PointAnnotationMessenger.getTextTranslateAnchor$__pigeon_messageChannelSuffix';
-    final BasicMessageChannel<Object?> __pigeon_channel =
-        BasicMessageChannel<Object?>(
+    final BasicMessageChannel<Object?> __pigeon_channel = BasicMessageChannel<Object?>(
       __pigeon_channelName,
       pigeonChannelCodec,
       binaryMessenger: __pigeon_binaryMessenger,

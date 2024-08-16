@@ -391,6 +391,7 @@ enum _MapEvent {
   renderFrameStarted,
   renderFrameFinished,
   resourceRequest,
+  locationChange,
 }
 
 /// Describes the glyphs rasterization option values.
@@ -729,6 +730,7 @@ class MapAnimationOptions {
   MapAnimationOptions({
     this.duration,
     this.startDelay,
+    this.curve,
   });
 
   /// The duration of the animation in milliseconds.
@@ -739,10 +741,15 @@ class MapAnimationOptions {
   /// If not set explicitly default startDelay will be taken 0ms. This only works for Android.
   int? startDelay;
 
+  /// The curve of the animation. If not set explicitly default curve will be taken `easeOut`.
+  /// values: 0 - easeInOut, 1 - easeIn, 2 - easeOut, 3 - linear
+  int? curve;
+
   Object encode() {
     return <Object?>[
       duration,
       startDelay,
+      curve,
     ];
   }
 
@@ -751,6 +758,7 @@ class MapAnimationOptions {
     return MapAnimationOptions(
       duration: result[0] as int?,
       startDelay: result[1] as int?,
+      curve: result[2] as int?,
     );
   }
 }
@@ -982,6 +990,38 @@ class ScreenCoordinate {
     return ScreenCoordinate(
       x: result[0]! as double,
       y: result[1]! as double,
+    );
+  }
+}
+
+
+class GestureScreenCoordinate extends ScreenCoordinate {
+  GestureScreenCoordinate({
+    required double x,
+    required double y,
+    required this.type,
+    required this.willAnimate,
+  }): super(x: x, y: y);
+
+  int type;
+  bool willAnimate;
+
+  Object encode() {
+    return <Object?>[
+      x,
+      y,
+      type,
+      willAnimate,
+    ];
+  }
+
+  static GestureScreenCoordinate decode(Object result) {
+    result as List<Object?>;
+    return GestureScreenCoordinate(
+      x: result[0]! as double,
+      y: result[1]! as double,
+      type: result[2]! as int,
+      willAnimate: result[3]! as bool,
     );
   }
 }

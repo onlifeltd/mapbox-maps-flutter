@@ -4,28 +4,30 @@ import 'package:mapbox_maps_example/animation.dart';
 import 'package:mapbox_maps_example/camera.dart';
 import 'package:mapbox_maps_example/circle_annotations.dart';
 import 'package:mapbox_maps_example/cluster.dart';
-import 'package:mapbox_maps_example/offline_map.dart';
-import 'package:mapbox_maps_example/model_layer.dart';
-import 'package:mapbox_maps_example/ornaments.dart';
+import 'package:mapbox_maps_example/cluster_point_annotations.dart';
 import 'package:mapbox_maps_example/geojson_line.dart';
 import 'package:mapbox_maps_example/image_source.dart';
 import 'package:mapbox_maps_example/map_interface.dart';
+import 'package:mapbox_maps_example/model_layer.dart';
+import 'package:mapbox_maps_example/offline_map.dart';
+import 'package:mapbox_maps_example/ornaments.dart';
 import 'package:mapbox_maps_example/polygon_annotations.dart';
 import 'package:mapbox_maps_example/polyline_annotations.dart';
 import 'package:mapbox_maps_example/snapshotter.dart';
-import 'package:mapbox_maps_example/traffic-route-line.dart';
 import 'package:mapbox_maps_example/tile_json.dart';
+import 'package:mapbox_maps_example/tracking_mode.dart';
+import 'package:mapbox_maps_example/traffic-route-line.dart';
 import 'package:mapbox_maps_example/vector_tile_source.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 
+import 'debug_options.dart';
 import 'full_map.dart';
+import 'gestures.dart';
 import 'location.dart';
 import 'page.dart';
 import 'point_annotations.dart';
 import 'projection.dart';
 import 'style.dart';
-import 'gestures.dart';
-import 'debug_options.dart';
 
 final List<ExamplePage> _allPages = <ExamplePage>[
   FullMapPage(),
@@ -49,6 +51,8 @@ final List<ExamplePage> _allPages = <ExamplePage>[
   AnimatedRoutePage(),
   SnapshotterPage(),
   TrafficRouteLinePage(),
+  ClusterPointAnnotationsPage(),
+  TrackingModePage(),
   OfflineMapPage(),
   ModelLayerPage(),
   DebugOptionsPage(),
@@ -80,8 +84,7 @@ class MapsDemo extends StatelessWidget {
           ? buildAccessTokenWarning()
           : ListView.separated(
               itemCount: _allPages.length,
-              separatorBuilder: (BuildContext context, int index) =>
-                  const Divider(height: 1),
+              separatorBuilder: (BuildContext context, int index) => const Divider(height: 1),
               itemBuilder: (_, int index) => ListTile(
                 leading: _allPages[index].leading,
                 title: Text(_allPages[index].title),
@@ -107,9 +110,7 @@ class MapsDemo extends StatelessWidget {
                     child: Text(text,
                         textAlign: TextAlign.center,
                         style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
+                            fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
                   ))
               .toList(),
         ),

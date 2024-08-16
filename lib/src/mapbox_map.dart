@@ -114,6 +114,9 @@ class MapboxMap extends ChangeNotifier {
     this.onMapTapListener,
     this.onMapLongTapListener,
     this.onMapScrollListener,
+    this.onGestureDidBeginListener,
+    this.onGestureDidEndListener,
+    this.onGestureDidEndWithAnimatingListener,
   }) : _mapboxMapsPlatform = mapboxMapsPlatform {
     _proxyBinaryMessenger = _mapboxMapsPlatform.binaryMessenger;
 
@@ -172,6 +175,9 @@ class MapboxMap extends ChangeNotifier {
   OnMapTapListener? onMapTapListener;
   OnMapLongTapListener? onMapLongTapListener;
   OnMapScrollListener? onMapScrollListener;
+  OnGestureListener? onGestureDidBeginListener;
+  OnGestureListener? onGestureDidEndListener;
+  OnGestureListener? onGestureDidEndWithAnimatingListener;
 
   @override
   void dispose() {
@@ -550,12 +556,19 @@ class MapboxMap extends ChangeNotifier {
   void _setupGestures() {
     if (onMapTapListener != null ||
         onMapLongTapListener != null ||
-        onMapScrollListener != null) {
+        onMapScrollListener != null ||
+        onGestureDidBeginListener != null ||
+        onGestureDidEndListener != null ||
+        onGestureDidEndWithAnimatingListener != null) {
       GestureListener.setUp(
           _GestureListener(
             onMapTapListener: onMapTapListener,
             onMapLongTapListener: onMapLongTapListener,
             onMapScrollListener: onMapScrollListener,
+            onMapGestureDidBeginListener: onGestureDidBeginListener,
+            onMapGestureDidEndListener: onGestureDidEndListener,
+            onMapGestureDidEndWithAnimatingListener:
+                onGestureDidEndWithAnimatingListener,
           ),
           binaryMessenger: _mapboxMapsPlatform.binaryMessenger);
       _mapboxMapsPlatform.addGestureListeners();
@@ -580,6 +593,11 @@ class MapboxMap extends ChangeNotifier {
   /// Returns a snapshot of the map.
   /// The snapshot is taken from the current state of the map.
   Future<Uint8List> snapshot() => _mapboxMapsPlatform.snapshot();
+
+  Future<dynamic> setStyleImportConfigProperty(
+      String config, dynamic value) async {
+    return _mapboxMapsPlatform.setStyleImportConfigProperty(config, value);
+  }
 }
 
 class _GestureListener extends GestureListener {
@@ -587,11 +605,17 @@ class _GestureListener extends GestureListener {
     this.onMapTapListener,
     this.onMapLongTapListener,
     this.onMapScrollListener,
+    this.onMapGestureDidBeginListener,
+    this.onMapGestureDidEndListener,
+    this.onMapGestureDidEndWithAnimatingListener,
   });
 
   final OnMapTapListener? onMapTapListener;
   final OnMapLongTapListener? onMapLongTapListener;
   final OnMapScrollListener? onMapScrollListener;
+  final OnGestureListener? onMapGestureDidBeginListener;
+  final OnGestureListener? onMapGestureDidEndListener;
+  final OnGestureListener? onMapGestureDidEndWithAnimatingListener;
 
   @override
   void onTap(MapContentGestureContext context) {
@@ -606,5 +630,20 @@ class _GestureListener extends GestureListener {
   @override
   void onScroll(MapContentGestureContext context) {
     onMapScrollListener?.call(context);
+  }
+
+  @override
+  void onDidBegin(MapContentGestureContext context) {
+    onMapGestureDidBeginListener?.call(context);
+  }
+
+  @override
+  void onDidEnd(MapContentGestureContext context) {
+    onMapGestureDidEndListener?.call(context);
+  }
+
+  @override
+  void onDidEndWithAnimating(MapContentGestureContext context) {
+    onMapGestureDidEndWithAnimatingListener?.call(context);
   }
 }

@@ -13,7 +13,7 @@ class HeatmapLayer extends Layer {
     String? slot,
     required String this.sourceId,
     String? this.sourceLayer,
-    int? this.heatmapColor,
+    String? this.heatmapColor,
     List<Object>? this.heatmapColorExpression,
     double? this.heatmapIntensity,
     List<Object>? this.heatmapIntensityExpression,
@@ -42,8 +42,7 @@ class HeatmapLayer extends Layer {
   String? sourceLayer;
 
   /// Defines the color of each pixel based on its density value in a heatmap. Should be an expression that uses `["heatmap-density"]` as input.
-  /// Default value: ["interpolate",["linear"],["heatmap-density"],0,"rgba(0, 0, 255, 0)",0.1,"royalblue",0.3,"cyan",0.5,"lime",0.7,"yellow",1,"red"].
-  int? heatmapColor;
+  String? heatmapColor;
 
   /// Defines the color of each pixel based on its density value in a heatmap. Should be an expression that uses `["heatmap-density"]` as input.
   /// Default value: ["interpolate",["linear"],["heatmap-density"],0,"rgba(0, 0, 255, 0)",0.1,"royalblue",0.3,"cyan",0.5,"lime",0.7,"yellow",1,"red"].
@@ -88,8 +87,7 @@ class HeatmapLayer extends Layer {
       layout["visibility"] = visibilityExpression!;
     }
     if (visibility != null) {
-      layout["visibility"] =
-          visibility!.name.toLowerCase().replaceAll("_", "-");
+      layout["visibility"] = visibility!.name.toLowerCase().replaceAll("_", "-");
     }
 
     var paint = {};
@@ -97,7 +95,7 @@ class HeatmapLayer extends Layer {
       paint["heatmap-color"] = heatmapColorExpression;
     }
     if (heatmapColor != null) {
-      paint["heatmap-color"] = heatmapColor?.toRGBA();
+      paint["heatmap-color"] = heatmapColor;
     }
 
     if (heatmapIntensityExpression != null) {
@@ -171,26 +169,20 @@ class HeatmapLayer extends Layer {
       slot: map["slot"],
       visibility: map["layout"]["visibility"] == null
           ? Visibility.VISIBLE
-          : Visibility.values.firstWhere((e) => e.name
-              .toLowerCase()
-              .replaceAll("_", "-")
-              .contains(map["layout"]["visibility"])),
+          : Visibility.values.firstWhere((e) =>
+              e.name.toLowerCase().replaceAll("_", "-").contains(map["layout"]["visibility"])),
       visibilityExpression: _optionalCastList(map["layout"]["visibility"]),
       filter: _optionalCastList(map["filter"]),
-      heatmapColor: (map["paint"]["heatmap-color"] as List?)?.toRGBAInt(),
+      heatmapColor: (map["paint"]["heatmap-color"] as String?),
       heatmapColorExpression: _optionalCastList(map["paint"]["heatmap-color"]),
       heatmapIntensity: _optionalCast(map["paint"]["heatmap-intensity"]),
-      heatmapIntensityExpression:
-          _optionalCastList(map["paint"]["heatmap-intensity"]),
+      heatmapIntensityExpression: _optionalCastList(map["paint"]["heatmap-intensity"]),
       heatmapOpacity: _optionalCast(map["paint"]["heatmap-opacity"]),
-      heatmapOpacityExpression:
-          _optionalCastList(map["paint"]["heatmap-opacity"]),
+      heatmapOpacityExpression: _optionalCastList(map["paint"]["heatmap-opacity"]),
       heatmapRadius: _optionalCast(map["paint"]["heatmap-radius"]),
-      heatmapRadiusExpression:
-          _optionalCastList(map["paint"]["heatmap-radius"]),
+      heatmapRadiusExpression: _optionalCastList(map["paint"]["heatmap-radius"]),
       heatmapWeight: _optionalCast(map["paint"]["heatmap-weight"]),
-      heatmapWeightExpression:
-          _optionalCastList(map["paint"]["heatmap-weight"]),
+      heatmapWeightExpression: _optionalCastList(map["paint"]["heatmap-weight"]),
     );
   }
 }

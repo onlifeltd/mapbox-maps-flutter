@@ -54,6 +54,7 @@ class MapWidget extends StatefulWidget {
     this.onMapCreated,
     this.onStyleLoadedListener,
     this.onCameraChangeListener,
+    this.onLocationChangeListener,
     this.onMapIdleListener,
     this.onMapLoadedListener,
     this.onMapLoadErrorListener,
@@ -69,6 +70,9 @@ class MapWidget extends StatefulWidget {
     this.onTapListener,
     this.onLongTapListener,
     this.onScrollListener,
+    this.onGestureDidBeginListener,
+    this.onGestureDidEndListener,
+    this.onGestureDidEndWithAnimatingListener,
   }) : super(key: key) {}
 
   /// Describes the map options value when using a MapWidget.
@@ -99,6 +103,9 @@ class MapWidget extends StatefulWidget {
 
   /// Invoked whenever camera position changes.
   final OnCameraChangeListener? onCameraChangeListener;
+
+  /// Invoked whenever location changes.
+  final OnLocationChangeListener? onLocationChangeListener;
 
   /// Invoked when the Map has entered the idle state. The Map is in the idle state when there are no ongoing transitions
   /// and the Map has rendered all available tiles.
@@ -158,6 +165,9 @@ class MapWidget extends StatefulWidget {
   final OnMapTapListener? onTapListener;
   final OnMapLongTapListener? onLongTapListener;
   final OnMapScrollListener? onScrollListener;
+  final OnGestureListener? onGestureDidBeginListener;
+  final OnGestureListener? onGestureDidEndListener;
+  final OnGestureListener? onGestureDidEndWithAnimatingListener;
 
   @override
   State createState() {
@@ -221,6 +231,7 @@ class _MapWidgetState extends State<MapWidget> {
   void _updateEventListeners() {
     _events._onStyleLoadedListener = widget.onStyleLoadedListener;
     _events._onCameraChangeListener = widget.onCameraChangeListener;
+    _events._onLocationChangeListener = widget.onLocationChangeListener;
     _events._onMapIdleListener = widget.onMapIdleListener;
     _events._onMapLoadedListener = widget.onMapLoadedListener;
     _events._onMapLoadErrorListener = widget.onMapLoadErrorListener;
@@ -242,6 +253,10 @@ class _MapWidgetState extends State<MapWidget> {
       onMapTapListener: widget.onTapListener,
       onMapLongTapListener: widget.onLongTapListener,
       onMapScrollListener: widget.onScrollListener,
+      onGestureDidBeginListener: widget.onGestureDidBeginListener,
+      onGestureDidEndListener: widget.onGestureDidEndListener,
+      onGestureDidEndWithAnimatingListener:
+          widget.onGestureDidEndWithAnimatingListener,
     );
     if (widget.onMapCreated != null) {
       widget.onMapCreated!(controller);
