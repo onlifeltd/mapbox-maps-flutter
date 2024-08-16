@@ -24,10 +24,8 @@ class AnimatedRoute extends StatefulWidget {
   State createState() => AnimatedRouteState();
 }
 
-class AnimatedRouteState extends State<AnimatedRoute>
-    with TickerProviderStateMixin {
-  final defaultEdgeInsets =
-      MbxEdgeInsets(top: 100, left: 100, bottom: 100, right: 100);
+class AnimatedRouteState extends State<AnimatedRoute> with TickerProviderStateMixin {
+  final defaultEdgeInsets = MbxEdgeInsets(top: 100, left: 100, bottom: 100, right: 100);
 
   late MapboxMap mapboxMap;
   late PointAnnotationManager pointAnnotationManager;
@@ -36,8 +34,7 @@ class AnimatedRouteState extends State<AnimatedRoute>
 
   _onMapCreated(MapboxMap mapboxMap) async {
     this.mapboxMap = mapboxMap;
-    this.pointAnnotationManager =
-        await mapboxMap.annotations.createPointAnnotationManager();
+    this.pointAnnotationManager = await mapboxMap.annotations.createPointAnnotationManager();
 
     await _getPermission();
   }
@@ -82,7 +79,17 @@ class AnimatedRouteState extends State<AnimatedRoute>
           onLocationChangeListener: (locationData) {
             print("Location changed: $locationData");
           },
+          onTapListener: (point) {
+            print("Map tapped: $point");
+          },
+          onLongTapListener: (point) {
+            print("Map long pressed: $point");
+          },
+          onScrollListener: (point) {
+            print("Map scrolled: $point");
+          },
           onGestureDidBeginListener: (_) {
+            print('onGestureDidBeginListener');
             if (trackLocation) {
               trackLocation = false;
               refreshTrackLocation();

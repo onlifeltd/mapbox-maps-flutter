@@ -2,7 +2,7 @@ import Foundation
 @_spi(Experimental) import MapboxMaps
 import Flutter
 
-final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRecognizerDelegate {
+final class GesturesController: NSObject, GesturesSettingsInterface, GestureManagerDelegate {
 
     private var cancelables: Set<AnyCancelable> = []
     private var onGestureListener: GestureListener?
@@ -10,20 +10,15 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
     private let mapView: MapView
 
     init(withMapView mapView: MapView) {
-        self.mapView = mapView
+      self.mapView = mapView
     }
-
+ 
     func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didBegin gestureType: MapboxMaps.GestureType) {
       let touchPoint = gestureManager.singleTapGestureRecognizer.location(in: mapView)
       let point = Point(mapView.mapboxMap.coordinate(for: touchPoint))
       let context = MapContentGestureContext(touchPosition: touchPoint.toFLTScreenCoordinate(), point: point)
 
       onGestureListener?.onGestureDidBegin(context: context, completion: { _ in })
-
-      guard gestureType == .singleTap else {
-          return
-      }
-      onGestureListener?.onTap(context: context, completion: { _ in })
     }
 
     func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didEnd gestureType: MapboxMaps.GestureType, willAnimate: Bool) {
@@ -148,12 +143,15 @@ final class GesturesController: NSObject, GesturesSettingsInterface, UIGestureRe
             self.onGestureListener?.onLongTap(context: context.toFLTMapContentGestureContext()) { _ in }
         }
         .store(in: &cancelables)
+      
+        mapView.gestures.delegate = self
     }
 
     func removeListeners() {
         cancelables = []
     }
 }
+
 
 
 extension MapboxMaps.GestureType {
