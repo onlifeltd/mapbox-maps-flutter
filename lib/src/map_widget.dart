@@ -185,6 +185,7 @@ class _MapWidgetState extends State<MapWidget> {
       ProxyBinaryMessenger(suffix: _suffix.toString());
   late final _MapEvents _events;
 
+  bool _platformViewCreated = false;
   MapboxMap? mapboxMap;
 
   @override
@@ -225,7 +226,10 @@ class _MapWidgetState extends State<MapWidget> {
     super.didUpdateWidget(oldWidget);
 
     _updateEventListeners();
-    _events.updateSubscriptions();
+
+    if (_platformViewCreated) {
+      _events.updateSubscriptions();
+    }
   }
 
   void _updateEventListeners() {
@@ -262,5 +266,8 @@ class _MapWidgetState extends State<MapWidget> {
       widget.onMapCreated!(controller);
     }
     mapboxMap = controller;
+    
+    _events.updateSubscriptions();
+    _platformViewCreated = true;
   }
 }
