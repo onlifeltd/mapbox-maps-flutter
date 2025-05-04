@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.mapbox.bindgen.DataRef
 import com.mapbox.bindgen.Value
+import com.mapbox.geojson.Feature
 import com.mapbox.maps.Image
 import com.mapbox.maps.MapboxStyleManager
 import com.mapbox.maps.RuntimeStylingOptions
@@ -18,6 +19,7 @@ import com.mapbox.maps.mapbox_maps.pigeons.CameraOptions
 import com.mapbox.maps.mapbox_maps.pigeons.CanonicalTileID
 import com.mapbox.maps.mapbox_maps.pigeons.CoordinateBounds
 import com.mapbox.maps.mapbox_maps.pigeons.DirectionalLight
+import com.mapbox.maps.mapbox_maps.pigeons.FeaturesetDescriptor
 import com.mapbox.maps.mapbox_maps.pigeons.FlatLight
 import com.mapbox.maps.mapbox_maps.pigeons.ImageContent
 import com.mapbox.maps.mapbox_maps.pigeons.ImageStretches
@@ -112,7 +114,7 @@ class StyleController(private val context: Context, private val styleManager: Ma
   override fun setStyleImportConfigProperties(importId: String, configs: Map<String, Any>) {
     styleManager.setStyleImportConfigProperties(
       importId,
-      configs.mapValues { it.toValue() } as HashMap<String, Value>
+      configs.mapValues { it.value.toValue() } as HashMap<String, Value>
     )
   }
 
@@ -342,6 +344,36 @@ class StyleController(private val context: Context, private val styleManager: Ma
     }
   }
 
+  override fun addGeoJSONSourceFeatures(
+    sourceId: String,
+    dataId: String,
+    features: List<Feature>,
+    callback: (Result<Unit>) -> Unit
+  ) {
+    val expected = styleManager.addGeoJSONSourceFeatures(sourceId, dataId, features)
+    callback(Result.success(Unit))
+  }
+
+  override fun updateGeoJSONSourceFeatures(
+    sourceId: String,
+    dataId: String,
+    features: List<Feature>,
+    callback: (Result<Unit>) -> Unit
+  ) {
+    val expected = styleManager.updateGeoJSONSourceFeatures(sourceId, dataId, features)
+    callback(Result.success(Unit))
+  }
+
+  override fun removeGeoJSONSourceFeatures(
+    sourceId: String,
+    dataId: String,
+    featureIds: List<String>,
+    callback: (Result<Unit>) -> Unit
+  ) {
+    val expected = styleManager.removeGeoJSONSourceFeatures(sourceId, dataId, featureIds)
+    callback(Result.success(Unit))
+  }
+
   override fun updateStyleImageSourceImage(
     sourceId: String,
     image: MbxImage,
@@ -483,8 +515,9 @@ class StyleController(private val context: Context, private val styleManager: Ma
       return
     }
 
-    val byteArray = ByteArray(image.data.buffer.capacity())
-    image.data.buffer.get(byteArray)
+    val buffer = image.data.buffer.also { it.rewind() }
+    val byteArray = ByteArray(buffer.capacity())
+    buffer.get(byteArray)
     callback(
       Result.success(
         MbxImage(width = image.width.toLong(), height = image.height.toLong(), data = byteArray)
@@ -554,6 +587,10 @@ class StyleController(private val context: Context, private val styleManager: Ma
   ) {
     styleManager.localizeLabels(Locale(locale), layerIds)
     callback(Result.success(Unit))
+  }
+
+  override fun getFeaturesets(): List<FeaturesetDescriptor> {
+    return styleManager.styleManager.styleFeaturesets.map { it.toFLTFeaturesetDescriptor() }
   }
 
   override fun addStyleImage(

@@ -2,29 +2,29 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mapbox_maps_example/example.dart';
 import 'package:mapbox_maps_example/utils.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import 'page.dart';
 
-class TrackingModePage extends ExamplePage {
-  TrackingModePage() : super(const Icon(Icons.map), 'Tracking Mode');
-
-  @override
-  Widget build(BuildContext context) {
-    return const AnimatedRoute();
-  }
-}
-
-class AnimatedRoute extends StatefulWidget {
-  const AnimatedRoute();
+class TrackingModeExample extends StatefulWidget implements Example {
+  const TrackingModeExample();
 
   @override
-  State createState() => AnimatedRouteState();
+  State createState() => TrackingModeExampleState();
+  
+  @override
+  Widget get leading => const Icon(Icons.spatial_tracking);
+  
+  @override
+  String? get subtitle => null;
+  
+  @override
+  String get title => 'Tracking Mode';
 }
 
-class AnimatedRouteState extends State<AnimatedRoute> with TickerProviderStateMixin {
+class TrackingModeExampleState extends State<TrackingModeExample> with TickerProviderStateMixin {
   final defaultEdgeInsets = MbxEdgeInsets(top: 100, left: 100, bottom: 100, right: 100);
 
   late MapboxMap mapboxMap;

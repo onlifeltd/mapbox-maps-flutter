@@ -28,6 +28,11 @@ import 'style/layer/location_indicator_layer_test.dart'
 import 'style/layer/raster_layer_test.dart' as raster_layer_test;
 import 'style/layer/sky_layer_test.dart' as sky_layer_test;
 import 'style/layer/symbol_layer_test.dart' as symbol_layer_test;
+import 'style/layer/model_layer_test.dart' as model_layer_test;
+import 'style/layer/slot_layer_test.dart' as slot_layer_test;
+import 'style/layer/raster_particle_layer_test.dart'
+    as raster_particle_layer_test;
+import 'style/layer/clip_layer_test.dart' as clip_layer_test;
 import 'style/source/geojson_source_test.dart' as geojson_source_test;
 import 'style/source/image_source_test.dart' as image_source_test;
 import 'style/source/raster_source_test.dart' as raster_source_test;
@@ -41,6 +46,9 @@ import 'attribution_test.dart' as attribution_test;
 import 'compass_test.dart' as compass_test;
 import 'scale_bar_test.dart' as scale_bar_test;
 import 'offline_test.dart' as offline_test;
+import 'snapshotter/snapshotter_test.dart' as snapshotter_test;
+import 'viewport_test.dart' as viewport_test;
+import 'interactive_features_test.dart' as interactive_features_test;
 
 void main() {
   animation_test.main();
@@ -67,6 +75,7 @@ void main() {
 
   // style tests
   style_test.main();
+  interactive_features_test.main();
 
   // layer tests
   background_layer_test.main();
@@ -80,6 +89,10 @@ void main() {
   hillshade_layer_test.main();
   heatmap_layer_test.main();
   fill_layer_test.main();
+  model_layer_test.main();
+  slot_layer_test.main();
+  raster_particle_layer_test.main();
+  clip_layer_test.main();
 
   // source tests
   vector_source_test.main();
@@ -88,6 +101,11 @@ void main() {
   rasterarray_source_test.main();
   image_source_test.main();
   geojson_source_test.main();
+
+  // snapshotter tests
+  snapshotter_test.main();
+
+  viewport_test.main();
 
   // location test has to be at the bottom as on iOS it triggers location permission dialog
   // to be shown which makes tests that rely on QRF/QSF fail

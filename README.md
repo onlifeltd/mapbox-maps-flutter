@@ -1,6 +1,6 @@
 # Mapbox Maps SDK Flutter SDK
 
-The Mapbox Maps SDK Flutter SDK is an officially developed solution from Mapbox that enables use of our latest Maps SDK product (v11.6.0-rc.1). The SDK allows developers to embed highly-customized maps using a Flutter widget on Android and iOS.
+The Mapbox Maps SDK Flutter SDK is an officially developed solution from Mapbox that enables use of our latest Maps SDK product (v11.11.0). The SDK allows developers to embed highly-customized maps using a Flutter widget on Android and iOS.
 
 Web and desktop are not supported. 
 
@@ -37,7 +37,7 @@ Contributions welcome!
 | Fill Annotations | :white_check_mark: | :white_check_mark: |
 | Snapshotter | :white_check_mark: | :white_check_mark: |
 | Offline | :white_check_mark: | :white_check_mark: |
-| Viewport | :x:                | :x: |
+| Viewport | :white_check_mark: | :white_check_mark: |
 | Style DSL   | :x:                | :x: |
 | Expression DSL   | :x:                | :x: |
 | View Annotations   | :x:                | :x: |
@@ -46,49 +46,34 @@ Contributions welcome!
 
 The Maps Flutter SDK is compatible with applications:
 
-- Deployed on iOS 12 or higher
+- Deployed on iOS 14 or higher
 - Built using the Android SDK 21 or higher
-- Built using the Dart SDK 3.0.0 or higher
+- Built using the Flutter SDK 3.22.3/Dart SDK 3.4.4 or higher
 
 ## Installation
 
 ### Configure credentials
-To run the Maps Flutter SDK you will need to configure the Mapbox Access Tokens. 
-Read more about access tokens and public/secret scopes in the platform [Android](https://docs.mapbox.com/android/maps/guides/install/#configure-credentials) or [iOS](https://docs.mapbox.com/ios/maps/guides/install/#step-4-configure-your-public-token) docs.
+To run the Maps Flutter SDK you will need to configure the Mapbox Access Token.
+Read more about access tokens in the platform [Android](https://docs.mapbox.com/android/maps/guides/install/#configure-credentials) or [iOS](https://docs.mapbox.com/ios/maps/guides/install/#step-4-configure-your-public-token) docs.
 
-#### Secret token
-To access platform SDKs you will need to create a secret access token with the `Downloads:Read` scope and then:
- - to download the Android SDK add the token configuration to `~/.gradle/gradle.properties` : 
-```
-  SDK_REGISTRY_TOKEN=YOUR_SECRET_MAPBOX_ACCESS_TOKEN
-```
- - to download the iOS SDK add the token configuration to `~/.netrc` :
-```
-  machine api.mapbox.com
-  login mapbox
-  password YOUR_SECRET_MAPBOX_ACCESS_TOKEN
-```
-
-To learn more about configuring your secret tokens for iOS, please see step 3 of the [configure credentials section](https://docs.mapbox.com/ios/maps/guides/install/#step-3-configure-your-secret-token) of the iOS Installation Guide.
-
-#### Public token
+#### Access token
 You can set the access token for Mapbox Maps Flutter SDK(as well as for every Mapbox SDK) via `MapboxOptions`:
 ```
   MapboxOptions.setAccessToken(ACCESS_TOKEN);
 ```
 
-It's a good practice to retrieve access tokens from some external source.
+It's a good practice to retrieve the access token from some external source.
 
 You can pass access token via the command line arguments when either building : 
 
 ```
-flutter build <platform> --dart-define PUBLIC_ACCESS_TOKEN=...
+flutter build <platform> --dart-define ACCESS_TOKEN=...
 ```
 
 or running the application : 
 
 ```
-flutter run --dart-define PUBLIC_ACCESS_TOKEN=...
+flutter run --dart-define ACCESS_TOKEN=...
 ```
 
 You can also persist token in launch.json : 
@@ -97,7 +82,7 @@ You can also persist token in launch.json :
     {
         ...
         "args": [
-            "--dart-define", "PUBLIC_ACCESS_TOKEN=..."
+            "--dart-define", "ACCESS_TOKEN=..."
         ],
     }
 ]
@@ -106,14 +91,6 @@ You can also persist token in launch.json :
 Then to retrieve the token from the environment in the application :
 ```
 String ACCESS_TOKEN = String.fromEnvironment("ACCESS_TOKEN");
-```
-
-### Add the dependency
-To use the Maps Flutter SDK add the git dependency to the pubspec.yaml:
-
-```
-dependencies:
-  mapbox_maps_flutter: ^2.2.0-beta.1
 ```
 
 ### Configure permissions
@@ -160,7 +137,7 @@ The `MapboxMap` controller instance is provided with `MapWidget.onMapCreated` ca
 `MapboxMap` exposes an entry point to the most of the APIs Maps Flutter SDK provides. It allows to control the map, camera, styles, observe map events, 
 query rendered features, etc.
 
-It's organized similarly to the [Android](https://docs.mapbox.com/android/maps/api/11.5.0/mapbox-maps-android/com.mapbox.maps/-mapbox-map/) and [iOS](https://docs.mapbox.com/ios/maps/api/11.5.0/documentation/mapboxmaps/mapboxmap) counterparts.
+It's organized similarly to the [Android](https://docs.mapbox.com/android/maps/api/11.11.0/mapbox-maps-android/com.mapbox.maps/-mapbox-map/) and [iOS](https://docs.mapbox.com/ios/maps/api/11.11.0/documentation/mapboxmaps/mapboxmap) counterparts.
 
 To interact with the map after it's created store the MapboxMap object somewhere : 
 ```
@@ -209,7 +186,7 @@ To use the 3D puck with model downloaded from Uri instead of the default 2D puck
                   "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Embedded/Duck.gltf",))));
 ```
 
-You can find more examples of customization in the sample [app](example/lib/location.dart).
+You can find more examples of customization in the sample [app](example/lib/location_example.dart).
 
 ## Markers and annotations
 Additional information is available in our [Flutter](https://docs.mapbox.com/flutter/maps/guides/markers-and-annotations/), [Android](https://docs.mapbox.com/android/maps/guides/annotations/), and [iOS](https://docs.mapbox.com/ios/maps/guides/annotations/) documentation.
@@ -227,9 +204,9 @@ To create 5 point annotations using custom icon:
     var options = <PointAnnotationOptions>[];
     for (var i = 0; i < 5; i++) {
       options.add(PointAnnotationOptions(
-          geometry: createRandomPoint().toJson(), image: list));
+          geometry: Point.fromJson(createRandomPoint().toJson()), image: list));
     }
-    pointAnnotationManager?.createMulti(options);
+    pointAnnotationManager.createMulti(options);
   });
 ```
 You can find more examples of the AnnotationManagers usage in the sample app : [point annotations](example/lib/point_annotations.dart), [circle annotations](example/lib/circle_annotations.dart), [polygon annotations](example/lib/polygon_annotations.dart), [polyline annotations](example/lib/polyline_annotations.dart). 
